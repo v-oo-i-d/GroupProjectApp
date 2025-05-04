@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Player Dashboard", page_icon="👤", layout="wide")
+st.set_page_config(page_title="Player Dashboard", page_icon="👤")
 
 # Gather players
-player_df = pd.read_csv("./data/Players.csv")
-player_df["fullName"] = player_df["firstName"] + " " + player_df["lastName"]
+players_df = pd.read_csv("./data/Players.csv")
+players_df["fullName"] = players_df["firstName"] + " " + players_df["lastName"]
 
 st.write("# Player Dashboards")
 st.write("Need to clean data (weights exceeding 70k lbs)")
@@ -14,16 +14,21 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # Select a player
 selected_player = st.selectbox("Search for a player:",
                      placeholder="Search",
-                     options=player_df["fullName"].dropna().sort_values().tolist())
+                     options=players_df["fullName"].dropna().sort_values().tolist())
 
 if selected_player:
-    # Gather player data
-    birthday = pd.to_datetime(player_df.query("fullName == @selected_player")["birthdate"]).dt.date.iloc[0].strftime("%B %d, %Y")
-    weight = round(pd.to_numeric(player_df.query("fullName == @selected_player")["bodyWeight"]).iloc[0], 1)
+    # Get player data
+    birthday = (pd.to_datetime(players_df.query("fullName == @selected_player")["birthdate"])).dt.date.iloc[0]
+    birthday = birthday.strftime("%B %d, %Y") if pd.notna(birthday) else "nan"
+
+    weight = round(pd.to_numeric(players_df.query("fullName == @selected_player")["bodyWeight"]).iloc[0], 1)
     weightUnit = "lbs"
-    height = round(pd.to_numeric(player_df.query("fullName == @selected_player")["height"]).iloc[0], 1)
+
+    height = round(pd.to_numeric(players_df.query("fullName == @selected_player")["height"]).iloc[0], 1)
     heightUnit = "in"
-    country = player_df.query("fullName == @selected_player")["country"].iloc[0]
+
+    country = players_df.query("fullName == @selected_player")["country"].iloc[0]
+
 
     units = st.segmented_control("Units", options=["Metric", "Imperial"], default="Metric")
 
