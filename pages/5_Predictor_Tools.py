@@ -22,7 +22,7 @@ with similar_players_tab:
 with player_vs_player_tab:
     st.write("Who would come out on top in a 1v1 match? Enter player stats and let us predict the likely winner!")
 
-    plr1, divider, plr2 = st.columns([3, 0.2, 3])
+    plr1, _, plr2 = st.columns([3, 0.2, 3])
 
     # Predictors
     height_range = list(range(int(players_df["height"].min()), int(players_df["height"].max()) + 1))
@@ -39,9 +39,6 @@ with player_vs_player_tab:
         plr1_country = st.selectbox("Origin", key="plr1_country", options=countries)
         plr1_uni = st.selectbox("University", key="plr1_uni", options=universities)
 
-    with divider:
-        st.markdown("<div class='vl'>&nbsp;</div>", unsafe_allow_html=True)
-
     with plr2:
         st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
         plr2_height = st.select_slider("Height", key="plr2_height", options=height_range)
@@ -53,15 +50,12 @@ with player_vs_player_tab:
 with game_prediction_tab:
     st.write("Based on these stats, which team is more likely to win?")
 
-    team1, divider, team2 = st.columns([3, 0.2, 3])
+    team1, _, team2 = st.columns([3, 0.2, 3])
     teams = sorted(pd.concat([games_df["hometeamName"], games_df["awayteamName"]]).unique())
 
     with team1:
         st.markdown("<h1 style='text-align:center'>Team 1</h1></div>", unsafe_allow_html=True)
         team1 = st.selectbox("Team 1", key="team1", options=teams)
-
-    with divider:
-        st.markdown("<div class='vl'>&nbsp;</div>", unsafe_allow_html=True)
 
     with team2:
         st.markdown("<h1 style='text-align:center'>Team 2</h1></div>", unsafe_allow_html=True)
