@@ -11,7 +11,7 @@ st.write("# Predictor Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
 
 
-def calculate_age(age: str) -> int:
+def calculate_age(bd: str) -> int:
     pass
 
 
