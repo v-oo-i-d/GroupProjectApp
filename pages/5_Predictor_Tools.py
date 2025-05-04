@@ -11,7 +11,7 @@ st.write("# Predictor Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
 
 
-def calculate_age(bd: str) -> int:
+def calculate_age(age: str) -> int:
     pass
 
 
@@ -21,6 +21,7 @@ with similar_players_tab:
 
 with player_vs_player_tab:
     st.write("Who would come out on top in a 1v1 match? Enter player stats and let us predict the likely winner!")
+    st.write("(Classification problem)")
 
     plr1, _, plr2 = st.columns([3, 0.2, 3])
 
@@ -28,7 +29,7 @@ with player_vs_player_tab:
     height_range = list(range(int(players_df["height"].min()), int(players_df["height"].max()) + 1))
     weight_range = list(range(int(players_df["bodyWeight"].min()), int(players_df["bodyWeight"].max()) + 1))
     countries = players_df["country"].sort_values().dropna().unique()
-    #TODO: "Anla" is not a country
+    #TODO: "Anla" is not a country or territory
     universities = players_df["lastAttended"].sort_values().dropna().unique()
     #TODO: "--" is not a university
 
@@ -49,7 +50,8 @@ with player_vs_player_tab:
 
 with game_prediction_tab:
     st.write("Based on these stats, which team is more likely to win?")
-
+    st.write("(Classification problem)")
+    
     team1, _, team2 = st.columns([3, 0.2, 3])
     teams = sorted(pd.concat([games_df["hometeamName"], games_df["awayteamName"]]).unique())
 
