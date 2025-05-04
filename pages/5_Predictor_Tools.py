@@ -4,8 +4,8 @@ import pandas as pd
 st.set_page_config(page_title="Predictor Tools", page_icon="🔧")
 
 # Gather relevant data
-players_df = pd.read_csv("./data/Players.csv")
-games_df = pd.read_csv("./data/Games.csv")
+players_df = pd.read_csv("./data/Players.csv", low_memory=False)
+games_df = pd.read_csv("./data/Games.csv", low_memory=False)
 
 st.write("# Predictor Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
