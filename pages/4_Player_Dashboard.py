@@ -66,3 +66,20 @@ if selected_player:
             delta_color="off"
         )
         a4.metric("Country", current_season_metrics.get('Country'), border=True)
+        st.markdown("<hr style='width:30%;margin:2em auto'>", unsafe_allow_html=True)
+
+        # Game Info
+        st.markdown("<center style='margin-bottom:1rem;'><b>Game Info</b></center>", unsafe_allow_html=True)
+        b1, b2 = st.columns(2)
+        b1.metric("Games Played", current_season_metrics.get('GamesPlayed'),
+                  border=True,
+                  delta=round(player_metric_diffs.get("GamesPlayed"), 1) if player_metric_diffs.get(
+                      "GamesPlayed") is not None else None
+                  )
+        b2.metric("Minutes Played", current_season_metrics.get('MinutesPlayed'),
+                  border=True,
+                  delta=round(player_metric_diffs.get("MinutesPlayed"), 1) if player_metric_diffs.get(
+                      "MinutesPlayed") is not None else None
+                  )
+
+st.dataframe(players_df.query('Player_Name == @selected_player'))

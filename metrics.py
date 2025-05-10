@@ -16,6 +16,7 @@ def abbreviation_to_position(abbr: str) -> str:
 def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: str) -> dict:
     player_season_df = players_df.query("Player_Name == @selected_player & SEASON_ID == @season")
 
+    #TODO: add more data here when needed
     return {
         "PlayerID": player_season_df["Player_ID"].iloc[0],
         "Position": abbreviation_to_position(player_season_df["Position"].iloc[0]),
@@ -24,7 +25,7 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "Height": feet_inches_to_m(player_season_df["Height"].iloc[0]),
         "Country": player_season_df["Country"].iloc[0],
         "GamesPlayed": player_season_df["GP"].iloc[0],
-        "HoursPlayed": round(player_season_df["MIN"].iloc[0] / 60, 1),
+        "MinutesPlayed": round(player_season_df["MIN"].iloc[0]),
     }
 
 def feet_inches_to_m(hgt: str) -> float:
@@ -45,8 +46,11 @@ def calculate_metric_diffs(current: dict, previous: dict) -> dict:
 
     for key in current:
         if key in previous:
+            print(key)
             try:
-                diffs[key] = current[key] - previous[key]
-            except TypeError as e:
+                diffs[key] = int(current[key] - previous[key])
+            except TypeError:
                 continue
+    print("Hours",diffs.get("HoursPlayed"))
+    print("Games",diffs.get("GamesPlayed"))
     return diffs
