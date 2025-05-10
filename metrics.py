@@ -16,7 +16,6 @@ def abbreviation_to_position(abbr: str) -> str:
 def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: str) -> dict:
     player_season_df = players_df.query("Player_Name == @selected_player & SEASON_ID == @season")
 
-    #TODO: add more data here when needed
     return {
         "PlayerID": player_season_df["Player_ID"].iloc[0],
         "Position": abbreviation_to_position(player_season_df["Position"].iloc[0]),
@@ -24,8 +23,21 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "Weight": pounds_to_kg(pd.to_numeric(player_season_df["Weight"]).iloc[0]),
         "Height": feet_inches_to_m(player_season_df["Height"].iloc[0]),
         "Country": player_season_df["Country"].iloc[0],
+
         "GamesPlayed": player_season_df["GP"].iloc[0],
         "MinutesPlayed": round(player_season_df["MIN"].iloc[0]),
+
+        "FieldGoalsMade": player_season_df["FGM"].iloc[0],
+        "FieldGoalsAttempted": player_season_df["FGA"].iloc[0],
+        "FieldGoalPercentage": round(player_season_df["FG_PCT"].iloc[0] * 100),
+
+        "ThreePointersMade": player_season_df["FG3M"].iloc[0],
+        "ThreePointersAttempted": player_season_df["FG3A"].iloc[0],
+        "ThreePointersPercentage": round(player_season_df["FG3_PCT"].iloc[0] * 100),
+
+        "FreeThrowsMade": player_season_df["FTM"].iloc[0],
+        "FreeThrowsAttempted": player_season_df["FTA"].iloc[0],
+        "FreeThrowsPercentage": round(player_season_df["FT_PCT"].iloc[0] * 100),
     }
 
 def feet_inches_to_m(hgt: str) -> float:
@@ -43,14 +55,10 @@ def calculate_percentage_change(old: float, new: float) -> str:
 
 def calculate_metric_diffs(current: dict, previous: dict) -> dict:
     diffs = {}
-
     for key in current:
         if key in previous:
-            print(key)
             try:
                 diffs[key] = int(current[key] - previous[key])
             except TypeError:
                 continue
-    print("Hours",diffs.get("HoursPlayed"))
-    print("Games",diffs.get("GamesPlayed"))
     return diffs
