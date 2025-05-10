@@ -1,4 +1,5 @@
 import streamlit as st
+from metrics import *
 import pandas as pd
 
 st.set_page_config(page_title="Predictor Tools", page_icon="🔧")
@@ -10,9 +11,6 @@ games_df = pd.read_csv("./data/NBA_Regular_Season_Games_2014_2025.csv")
 st.write("# Predictor Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
 
-
-def calculate_age(age: str) -> int:
-    pass
 
 
 with similar_players_tab:
@@ -26,12 +24,13 @@ with player_vs_player_tab:
     plr1, _, plr2 = st.columns([3, 0.2, 3])
 
     # Predictors
-    height_range = list(range(int(players_df["height"].min()), int(players_df["height"].max()) + 1))
-    weight_range = list(range(int(players_df["bodyWeight"].min()), int(players_df["bodyWeight"].max()) + 1))
-    countries = players_df["country"].sort_values().dropna().unique()
-    #TODO: "Anla" is not a country or territory
-    universities = players_df["lastAttended"].sort_values().dropna().unique()
-    #TODO: "--" is not a university
+    height_range = list(range(int(feet_inches_to_cm(players_df["Height"].min())), int(feet_inches_to_cm(players_df["Height"].max())) + 1))
+    weight_range = list(range(int(players_df["Weight"].min()), int(players_df["Weight"].max()) + 1))
+    countries = players_df["Country"].sort_values().dropna().unique()
+    #TODO: "DRC" -> "Democratic Republic of the Congo"
+    universities = players_df["College"].sort_values().dropna().unique()
+    #TODO: "St. John's, N.Y." -> "St. John's (NY)"
+    #TODO: "New Zealand Breakers" is not a college
 
     with plr1:
         st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
@@ -53,7 +52,7 @@ with game_prediction_tab:
     st.write("(Classification problem)")
 
     team1, _, team2 = st.columns([3, 0.2, 3])
-    teams = sorted(pd.concat([games_df["hometeamName"], games_df["awayteamName"]]).unique())
+    teams = games_df["TEAM_NAME"].sort_values().unique()
 
     with team1:
         st.markdown("<h1 style='text-align:center'>Team 1</h1></div>", unsafe_allow_html=True)

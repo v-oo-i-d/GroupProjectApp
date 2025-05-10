@@ -10,7 +10,7 @@ players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025.csv")
 
 
 st.write("# Player Dashboards")
-st.markdown("<hr>", unsafe_allow_html=True)
+st.divider()
 
 # Select a player
 selected_player = st.selectbox("Search for a player:",
@@ -58,7 +58,7 @@ if selected_player:
         st.markdown("<h3>Basic Info</h3>", unsafe_allow_html=True)
         a1, a2, a3, a4 = st.columns(4)
         a1.metric("Age", current_season_metrics.get('Age'), border=True)
-        a2.metric("Height (m)", current_season_metrics.get('Height'),  border=True)
+        a2.metric("Height (m)", round(current_season_metrics.get('Height')/100, 2),  border=True)
         a3.metric("Weight (kg)", current_season_metrics.get('Weight'), border=True)
         a4.metric("Country", current_season_metrics.get('Country'), border=True)
         st.divider()
@@ -145,7 +145,7 @@ if selected_player:
 
 
 
-        # Shooting Goals
+        # Field goals plot
         metrics_to_plot = ["FG_PCT", "FT_PCT", "FG3_PCT"]
         stat_renames = {
             "FG_PCT": "Field Goals",
@@ -194,6 +194,7 @@ if selected_player:
                   delta=str(player_metric_diffs.get("Blocks")) + "%" if player_metric_diffs.get(
                       "Blocks") is not None else None
                   )
+
 
 
         # Display raw data as table

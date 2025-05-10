@@ -22,7 +22,7 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "Position": abbreviation_to_position(player_season_df["Position"].iloc[0]),
         "Age": round(player_season_df["PLAYER_AGE"].iloc[0]),
         "Weight": pounds_to_kg(pd.to_numeric(player_season_df["Weight"]).iloc[0]),
-        "Height": feet_inches_to_m(player_season_df["Height"].iloc[0]),
+        "Height": feet_inches_to_cm(player_season_df["Height"].iloc[0]),
         "Country": player_season_df["Country"].iloc[0],
 
         "GamesPlayed": player_season_df["GP"].iloc[0],
@@ -45,9 +45,9 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "Blocks": player_season_df["BLK"].iloc[0]
     }
 
-def feet_inches_to_m(hgt: str) -> float:
+def feet_inches_to_cm(hgt: str) -> float:
     feet, inches = map(int, hgt.split("-"))
-    return round((feet * 12 + inches) * 0.0254, 2)
+    return round((feet * 12 + inches) * 2.54, 2)
 
 def pounds_to_kg(lbs: float) -> float:
     return round(lbs / 2.205, 1)
