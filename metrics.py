@@ -18,6 +18,7 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
 
     return {
         "PlayerID": player_season_df["Player_ID"].iloc[0],
+        "Team": player_season_df["Team"].iloc[0],
         "Position": abbreviation_to_position(player_season_df["Position"].iloc[0]),
         "Age": round(player_season_df["PLAYER_AGE"].iloc[0]),
         "Weight": pounds_to_kg(pd.to_numeric(player_season_df["Weight"]).iloc[0]),
@@ -41,7 +42,7 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
 
         "Assists": player_season_df["AST"].iloc[0],
         "Steals": player_season_df["STL"].iloc[0],
-        "Blocks": round(player_season_df["BLK"].iloc[0] * 100),
+        "Blocks": player_season_df["BLK"].iloc[0]
     }
 
 def feet_inches_to_m(hgt: str) -> float:
