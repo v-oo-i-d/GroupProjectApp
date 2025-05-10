@@ -38,6 +38,10 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "FreeThrowsMade": player_season_df["FTM"].iloc[0],
         "FreeThrowsAttempted": player_season_df["FTA"].iloc[0],
         "FreeThrowsPercentage": round(player_season_df["FT_PCT"].iloc[0] * 100),
+
+        "Assists": player_season_df["AST"].iloc[0],
+        "Steals": player_season_df["STL"].iloc[0],
+        "Blocks": round(player_season_df["BLK"].iloc[0] * 100),
     }
 
 def feet_inches_to_m(hgt: str) -> float:

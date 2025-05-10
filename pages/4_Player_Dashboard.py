@@ -53,16 +53,17 @@ if selected_player:
 
 
         # Basic Info
-        st.markdown("<center style='margin-bottom:1rem;'><b>Basic Info</b></center>", unsafe_allow_html=True)
+        st.markdown("<h3>Basic Info</h3>", unsafe_allow_html=True)
         a1, a2, a3, a4 = st.columns(4)
         a1.metric("Age", current_season_metrics.get('Age'), border=True)
         a2.metric("Height (m)", current_season_metrics.get('Height'),  border=True)
         a3.metric("Weight (kg)", current_season_metrics.get('Weight'), border=True)
         a4.metric("Country", current_season_metrics.get('Country'), border=True)
+        st.divider()
 
 
         # Game Stats
-        st.markdown("<center style='margin-bottom:1rem;'><b>Game Stats</b></center>", unsafe_allow_html=True)
+        st.markdown("<h3>Game Stats</h3>", unsafe_allow_html=True)
         b1, b2 = st.columns(2)
         b1.metric("Games Played", current_season_metrics.get('GamesPlayed'),
                   border=True,
@@ -74,11 +75,12 @@ if selected_player:
                   delta=round(player_metric_diffs.get("MinutesPlayed"), 1) if player_metric_diffs.get(
                       "MinutesPlayed") is not None else None
                   )
+        st.divider()
 
 
 
         # Field Goals
-        st.markdown("<center style='margin-bottom:1rem;'><b>Field Goals</b></center>", unsafe_allow_html=True)
+        st.markdown("<h3>Field Goals</h3>", unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
         c1.metric("Made", current_season_metrics.get('FieldGoalsMade'),
                   border=True,
@@ -95,11 +97,12 @@ if selected_player:
                   delta=str(player_metric_diffs.get("FieldGoalPercentage")) + "%" if player_metric_diffs.get(
                       "FieldGoalPercentage") is not None else None
                   )
+        st.divider()
 
 
 
         # Three Pointers
-        st.markdown("<center style='margin-bottom:1rem;'><b>Three Pointers</b></center>", unsafe_allow_html=True)
+        st.markdown("<h3>Three Pointers</h3>", unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
         c1.metric("Made", current_season_metrics.get('ThreePointersMade'),
                   border=True,
@@ -116,11 +119,11 @@ if selected_player:
                   delta=str(player_metric_diffs.get("ThreePointersPercentage")) + "%" if player_metric_diffs.get(
                       "ThreePointersPercentage") is not None else None
                   )
-
+        st.divider()
 
 
         # Free Throws
-        st.markdown("<center style='margin-bottom:1rem;'><b>Free Throws</b></center>", unsafe_allow_html=True)
+        st.markdown("<h3>Free Throws</h3>", unsafe_allow_html=True)
         c1, c2, c3 = st.columns(3)
         c1.metric("Made", current_season_metrics.get('FreeThrowsMade'),
                   border=True,
@@ -136,4 +139,25 @@ if selected_player:
                   border=True,
                   delta=str(player_metric_diffs.get("FreeThrowsPercentage")) + "%" if player_metric_diffs.get(
                       "FreeThrowsPercentage") is not None else None
+                  )
+
+
+
+        # Playmaking and Defense
+        st.markdown("<h3>Playmaking and Defense</h3>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Assists", current_season_metrics.get('Assists'),
+                  border=True,
+                  delta=round(player_metric_diffs.get("Assists"), 1) if player_metric_diffs.get(
+                      "Assists") is not None else None
+                  )
+        c2.metric("Steals", current_season_metrics.get('Steals'),
+                  border=True,
+                  delta=round(player_metric_diffs.get("Steals"), 1) if player_metric_diffs.get(
+                      "Steals") is not None else None
+                  )
+        c3.metric("Blocks", current_season_metrics.get('Blocks'),
+                  border=True,
+                  delta=str(player_metric_diffs.get("Blocks")) + "%" if player_metric_diffs.get(
+                      "Blocks") is not None else None
                   )
