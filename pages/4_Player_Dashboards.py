@@ -145,7 +145,7 @@ if selected_player:
 
 
 
-        # Shooting Goals
+        # Field goals plot
         metrics_to_plot = ["FG_PCT", "FT_PCT", "FG3_PCT"]
         stat_renames = {
             "FG_PCT": "Field Goals",
