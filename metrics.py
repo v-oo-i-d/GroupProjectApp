@@ -43,14 +43,10 @@ def calculate_percentage_change(old: float, new: float) -> str:
 
 def calculate_metric_diffs(current: dict, previous: dict) -> dict:
     diffs = {}
-
     for key in current:
         if key in previous:
-            print(key)
             try:
                 diffs[key] = int(current[key] - previous[key])
             except TypeError:
                 continue
-    print("Hours",diffs.get("HoursPlayed"))
-    print("Games",diffs.get("GamesPlayed"))
     return diffs
