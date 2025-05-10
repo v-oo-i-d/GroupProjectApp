@@ -1,4 +1,5 @@
 import streamlit as st
+from metrics import *
 import pandas as pd
 
 st.set_page_config(page_title="Player Dashboard", page_icon="👤")
@@ -16,108 +17,52 @@ selected_player = st.selectbox("Search for a player:",
                      options=players_df["Player_Name"].dropna().sort_values().unique().tolist())
 
 
-def feet_inches_to_metres(hgt: str) -> float:
-    feet = int(hgt.split()[0].replace("ft", ""))
-    inches = int(hgt.split()[1].replace("in", ""))
-    return (feet * 30.48) + (inches * 2.54)
-
-
 if selected_player:
-    # Get player data
-    age = round(players_df.query("Player_Name == @selected_player")["PLAYER_AGE"].iloc[0])
-
-    weight = round(pd.to_numeric(players_df.query("Player_Name == @selected_player")["Weight"]).iloc[0], 1)
-    weightUnit = "lbs"
-
-    height = players_df.query("Player_Name == @selected_player")["Height"].iloc[0].replace("-", "ft ") + "in"
-    heightUnit = "ft. in."
-
-    country = players_df.query("Player_Name == @selected_player")["Country"].iloc[0]
-
-
-    units = st.segmented_control("Units", options=["Metric", "Imperial"], default="Metric")
-
     with st.container(border=True):
-        st.markdown(f"<h2 style='text-align: center;'>{selected_player}</h2>", unsafe_allow_html=True)
-        st.markdown("<hr style='margin:0'>", unsafe_allow_html=True)
+        # Season selector
+        seasons = players_df[players_df["Player_Name"] == selected_player]["SEASON_ID"].sort_values(ascending=False).unique().tolist()
+        default_season = seasons[0] if len(seasons) > 0 else None
+        selected_season = st.segmented_control("Season", options=seasons, default=default_season)
+        selected_index = seasons.index(selected_season)
+        current_season_metrics = get_player_metrics(players_df, selected_player, selected_season)
+        previous_season_metrics = None
 
-        if units == "Metric":
-            # Convert
-            weight = round(weight / 2.205, 1)
-            weightUnit = "kg"
-            height = round(feet_inches_to_metres(height), 1)
-            heightUnit = "m"
+        if len(seasons) > 1:
+            try:
+                previous_season_metrics = get_player_metrics(players_df, selected_player, seasons[selected_index+1])
+            except IndexError:
+                pass
 
-        # Styles
-        st.markdown("""
-            <style>
-                .section-header {
-                    font-weight: bold;
-                    text-align: center;
-                    margin-bottom: 10px;
-                }
-                .section-container {
-                    display: flex;
-                    justify-content: space-evenly;
-                    align-items: center;
-                    width: 100%;
-                }
-                .stat-header {
-                    color: grey;
-                    margin-bottom: 5px;
-                }
-                .section-stat {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    flex: 1;
-                }
-            </style>
-        """, unsafe_allow_html=True)
 
-        # Content
-        st.markdown(f"""
-            <p class='section-header'>Basic Info</p>
-            <div class='section-container'>
-                <div class='section-stat'>
-                    <p class='stat-header'>Age</p>
-                    <p>{age}</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Height ({heightUnit})</p>
-                    <p>{height}</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Weight ({weightUnit})</p>
-                    <p>{weight}</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Country</p>
-                    <p>{country}</p>
-                </div>
-            </div>
-                <hr style="width: 30%; margin: 1em auto 2em auto">
-            <p class='section-header'>More Stats</p>
-            <div class='section-container'>
-                <div class='section-stat'>
-                    <p class='stat-header'>Stat 1</p>
-                    <p>A</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Stat 2</p>
-                    <p>B</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Stat 3</p>
-                    <p>C</p>
-                </div>
-                <div class='section-stat'>
-                    <p class='stat-header'>Stat 4</p>
-                    <p>D</p>
-                </div>
-            </div>
-            <hr style="width: 30%; margin: 1em auto 2em auto">
-            
-            
-        """, unsafe_allow_html=True)
+        # Header
+        st.markdown(f"<center><img style='height:10rem;' src='https://cdn.nba.com/headshots/nba/latest/1040x760/{current_season_metrics.get('PlayerID')}.png'></center>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='margin:0;padding-bottom:0;height:2em;'><center>{selected_player}</center></h2>", unsafe_allow_html=True)
+        st.markdown(f"<center style='color:grey;'>{current_season_metrics.get('Position')}</center>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin:1em 0;'>", unsafe_allow_html=True)
+
+
+        # Get selected seasons' metrics
+        player_metric_diffs = {}
+        for season in seasons:
+            if selected_season == season:
+                current_season_metrics = get_player_metrics(players_df, selected_player, season)
+            else:
+                if previous_season_metrics:
+                    player_metric_diffs = calculate_metric_diffs(current_season_metrics, previous_season_metrics)
+
+
+        # Basic Info
+        st.markdown("<center style='margin-bottom:1rem;'><b>Basic Info</b></center>", unsafe_allow_html=True)
+        a1, a2, a3, a4 = st.columns(4)
+        a1.metric("Age", current_season_metrics.get('Age'), border=True)
+        a2.metric("Height (m)", current_season_metrics.get('Height'),
+            border=True,
+            delta=round(player_metric_diffs.get("Height"), 1) if player_metric_diffs.get("Height") is not None else None,
+            delta_color="off"
+        )
+        a3.metric("Weight (kg)", current_season_metrics.get('Weight'),
+            border=True,
+            delta=round(player_metric_diffs.get("Weight"), 1) if player_metric_diffs.get("Weight") is not None else None,
+            delta_color="off"
+        )
+        a4.metric("Country", current_season_metrics.get('Country'), border=True)
