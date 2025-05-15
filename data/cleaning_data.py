@@ -25,8 +25,36 @@ play_off_df_clean = play_off_df.dropna()
 
 print(reg_season_df.duplicated().sum())
 print(play_off_df.duplicated().sum())
-#no duplicated rows.
+#no duplicated rows
 
+#ensure values are consitent
+reg_season_df['TEAM_NAME'] = reg_season_df['TEAM_NAME'].str.strip().str.upper()
+play_off_df['TEAM_NAME'] = play_off_df['TEAM_NAME'].str.strip().str.upper()
+
+#followed suit with Michael's approach to remove "irrelevant columns"
+if "SEASON" in reg_season_df.columns:
+    reg_season_df = reg_season_df.drop("SEASON", axis=1)
+if "SEASON" in play_off_df.columns:
+    play_off_df = play_off_df.drop("SEASON", axis=1)
+if "TEAM_ID" in reg_season_df.columns:
+    reg_season_df = reg_season_df.drop("TEAM_ID", axis=1)
+if "TEAM_ID" in play_off_df.columns:
+    play_off_df = play_off_df.drop("TEAM_ID", axis=1)
+if "GAME_ID" in reg_season_df.columns:
+    reg_season_df = reg_season_df.drop("GAME_ID", axis=1)
+if "GAME_ID" in play_off_df.columns:
+    play_off_df = play_off_df.drop("GAME_ID", axis=1)
+
+reg_season_df['IS_PLAYOFF'] = 0
+play_off_df['IS_PLAYOFF'] = 1
+
+combined_df = pd.concat([reg_season_df, play_off_df], ignore_index=True)
+play_off_df.to_csv("NBA_Playoff_Games_2014_2025.csv")
+reg_season_df.to_csv("NBA_Regular_Season_Games_2014_2025.csv")
+combined_df.to_csv("NBA_Regular_And_Playoff_Games.csv")
+
+print(combined_df['IS_PLAYOFF'].value_counts())  # Sanity check
+print(combined_df.head())
 ###--- Cleaning the player dataset ---###
 
 # Dropping irrelevant/duplicate columns:
@@ -60,4 +88,4 @@ player_info[player_info.isna().all(axis=1)]
 player_info = player_info.drop_duplicates()
 
 # Export
-players_df.to_csv("NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv")
+player_info.to_csv("NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv")
