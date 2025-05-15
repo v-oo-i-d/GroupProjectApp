@@ -17,17 +17,14 @@ print(play_off_df['GAME_DATE'].head())
 #can confirm that the data type of each column is appropriate for the data (now)
 
 print(reg_season_df.isna().sum())
-print(player_info.isna().sum())
 print(play_off_df.isna().sum())
 #identified some emtpy rows <10 so just going to remove them :)
 
 reg_season_df_clean = reg_season_df.dropna()
 play_off_df_clean = play_off_df.dropna()
-player_info = player_info.dropna()
 
 print(reg_season_df.duplicated().sum())
 print(play_off_df.duplicated().sum())
-print(player_info.duplicated().sum())
 #no duplicated rows.
 
 ###--- Cleaning the player dataset ---###
@@ -48,9 +45,8 @@ players_df = players_df[players_df["TEAM_ID"] != 0]
 # Replacing country "DRC" with "Democratic Republic of the Congo"
 players_df.loc[:, "Country"] = players_df["Country"].copy().replace({"DRC": "Democratic Republic of the Congo"})
 
-# Replacing and removing invalid colleges
+# Renaming and removing invalid colleges
 players_df = players_df[players_df["College"] != "New Zealand Breakers"]
-players_df.College.sort_values().unique()
 players_df.loc[:, "College"] = players_df["College"].copy().replace({
     "St. John's, N.Y.": "St. John's (NY)",
     "California-Santa Barbara": "Cal-Santa Barbara",
@@ -62,4 +58,3 @@ players_df[players_df.isna().all(axis=1)]
 
 # Drop any dupes
 players_df = players_df.drop_duplicates()
-
