@@ -30,3 +30,36 @@ print(play_off_df.duplicated().sum())
 print(player_info.duplicated().sum())
 #no duplicated rows.
 
+###--- Cleaning the player dataset ---###
+
+# Dropping irrelevant/duplicate columns:
+if "Player_ID" in players_df.columns:
+    players_df = players_df.drop("Player_ID", axis=1)
+if "LEAGUE_ID" in players_df.columns:
+    players_df = players_df.drop("LEAGUE_ID", axis=1)
+if "Season" in players_df.columns:
+    players_df = players_df.drop("Season", axis=1)
+if "Team" in players_df.columns:
+    players_df = players_df.drop("Team", axis=1)
+
+# Dropping rows where team_id is 0
+players_df = players_df[players_df["TEAM_ID"] != 0]
+
+# Replacing country "DRC" with "Democratic Republic of the Congo"
+players_df.loc[:, "Country"] = players_df["Country"].copy().replace({"DRC": "Democratic Republic of the Congo"})
+
+# Replacing and removing invalid colleges
+players_df = players_df[players_df["College"] != "New Zealand Breakers"]
+players_df.College.sort_values().unique()
+players_df.loc[:, "College"] = players_df["College"].copy().replace({
+    "St. John's, N.Y.": "St. John's (NY)",
+    "California-Santa Barbara": "Cal-Santa Barbara",
+    "Louisana-Lafayette": "Louisiana-Lafayette"
+})
+
+# No NA rows
+players_df[players_df.isna().all(axis=1)]
+
+# Drop any dupes
+players_df = players_df.drop_duplicates()
+
