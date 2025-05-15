@@ -1,6 +1,4 @@
 import streamlit as st
-from fontTools.misc.cython import returns
-
 from metrics import *
 import pandas as pd
 import altair as alt
