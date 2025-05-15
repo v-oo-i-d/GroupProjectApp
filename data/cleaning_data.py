@@ -36,25 +36,19 @@ if "SEASON" in reg_season_df.columns:
     reg_season_df = reg_season_df.drop("SEASON", axis=1)
 if "SEASON" in play_off_df.columns:
     play_off_df = play_off_df.drop("SEASON", axis=1)
-if "TEAM_ID" in reg_season_df.columns:
-    reg_season_df = reg_season_df.drop("TEAM_ID", axis=1)
-if "TEAM_ID" in play_off_df.columns:
-    play_off_df = play_off_df.drop("TEAM_ID", axis=1)
-if "GAME_ID" in reg_season_df.columns:
-    reg_season_df = reg_season_df.drop("GAME_ID", axis=1)
-if "GAME_ID" in play_off_df.columns:
-    play_off_df = play_off_df.drop("GAME_ID", axis=1)
 
 reg_season_df['IS_PLAYOFF'] = 0
 play_off_df['IS_PLAYOFF'] = 1
 
 combined_df = pd.concat([reg_season_df, play_off_df], ignore_index=True)
-play_off_df.to_csv("NBA_Playoff_Games_2014_2025.csv")
-reg_season_df.to_csv("NBA_Regular_Season_Games_2014_2025.csv")
-combined_df.to_csv("NBA_Regular_And_Playoff_Games.csv")
+play_off_df.to_csv("data/NBA_Playoff_Games_2014_2025_Cleaned.csv")
+reg_season_df.to_csv("data/NBA_Regular_Season_Games_2014_2025_Cleaned.csv")
+combined_df.to_csv("data/NBA_Regular_And_Playoff_Games.csv")
 
-print(combined_df['IS_PLAYOFF'].value_counts())  # Sanity check
-print(combined_df.head())
+#print(combined_df['IS_PLAYOFF'].value_counts())  
+#print(combined_df.head())
+
+#was just used to check that df's had been combined with flags established
 ###--- Cleaning the player dataset ---###
 
 # Dropping irrelevant/duplicate columns:
