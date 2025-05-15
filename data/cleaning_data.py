@@ -58,3 +58,6 @@ player_info[player_info.isna().all(axis=1)]
 
 # Drop any dupes
 player_info = player_info.drop_duplicates()
+
+# Export
+players_df.to_csv("NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv")
