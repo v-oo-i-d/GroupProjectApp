@@ -30,31 +30,31 @@ print(play_off_df.duplicated().sum())
 ###--- Cleaning the player dataset ---###
 
 # Dropping irrelevant/duplicate columns:
-if "Player_ID" in players_df.columns:
-    players_df = players_df.drop("Player_ID", axis=1)
-if "LEAGUE_ID" in players_df.columns:
-    players_df = players_df.drop("LEAGUE_ID", axis=1)
-if "Season" in players_df.columns:
-    players_df = players_df.drop("Season", axis=1)
-if "Team" in players_df.columns:
-    players_df = players_df.drop("Team", axis=1)
+if "Player_ID" in player_info.columns:
+    player_info = player_info.drop("Player_ID", axis=1)
+if "LEAGUE_ID" in player_info.columns:
+    player_info = player_info.drop("LEAGUE_ID", axis=1)
+if "Season" in player_info.columns:
+    player_info = player_info.drop("Season", axis=1)
+if "Team" in player_info.columns:
+    player_info = player_info.drop("Team", axis=1)
 
 # Dropping rows where team_id is 0
-players_df = players_df[players_df["TEAM_ID"] != 0]
+player_info = player_info[player_info["TEAM_ID"] != 0]
 
 # Replacing country "DRC" with "Democratic Republic of the Congo"
-players_df.loc[:, "Country"] = players_df["Country"].copy().replace({"DRC": "Democratic Republic of the Congo"})
+player_info.loc[:, "Country"] = player_info["Country"].copy().replace({"DRC": "Democratic Republic of the Congo"})
 
 # Renaming and removing invalid colleges
-players_df = players_df[players_df["College"] != "New Zealand Breakers"]
-players_df.loc[:, "College"] = players_df["College"].copy().replace({
+player_info = player_info[player_info["College"] != "New Zealand Breakers"]
+player_info.loc[:, "College"] = player_info["College"].copy().replace({
     "St. John's, N.Y.": "St. John's (NY)",
     "California-Santa Barbara": "Cal-Santa Barbara",
     "Louisana-Lafayette": "Louisiana-Lafayette"
 })
 
 # No NA rows
-players_df[players_df.isna().all(axis=1)]
+player_info[player_info.isna().all(axis=1)]
 
 # Drop any dupes
-players_df = players_df.drop_duplicates()
+player_info = player_info.drop_duplicates()
