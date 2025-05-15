@@ -24,6 +24,7 @@ with player_vs_player_tab:
     plr1, _, plr2 = st.columns([3, 0.2, 3])
 
     # Predictors
+    age_range = list(range(int(players_df["PLAYER_AGE"].min()), int(players_df["PLAYER_AGE"].max()) + 1))
     height_range = list(range(int(feet_inches_to_cm(players_df["Height"].min())), int(feet_inches_to_cm(players_df["Height"].max())) + 1))
     weight_range = list(range(int(players_df["Weight"].min()), int(players_df["Weight"].max()) + 1))
     countries = players_df["Country"].sort_values().dropna().unique()
@@ -34,6 +35,7 @@ with player_vs_player_tab:
 
     with plr1:
         st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
+        plr1_age = st.select_slider("Age", key="plr1_age", options=age_range)
         plr1_height = st.select_slider("Height", key="plr1_height", options=height_range)
         plr1_weight = st.select_slider("Weight", key="plr1_weight", options=weight_range)
         plr1_country = st.selectbox("Origin", key="plr1_country", options=countries)
@@ -41,6 +43,7 @@ with player_vs_player_tab:
 
     with plr2:
         st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
+        plr2_age = st.select_slider("Age", key="plr2_age", options=age_range)
         plr2_height = st.select_slider("Height", key="plr2_height", options=height_range)
         plr2_weight = st.select_slider("Weight", key="plr2_weight", options=weight_range)
         plr2_country = st.selectbox("Origin", key="plr2_country", options=countries)

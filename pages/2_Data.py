@@ -35,9 +35,9 @@ with st.sidebar:
 import os
 
 for file in os.listdir("./data"):
-    if file.endswith(".csv"):
-        df = pd.read_csv(os.path.join("./data", file))
-        st.write(df)
+    if file.endswith("Cleaned.csv"):
+        df = pd.read_csv(os.path.join("./data", file), index_col=0).reset_index(drop=True)
+        st.dataframe(df)
 
 
 # st.markdown("## Games.csv")

@@ -1,5 +1,12 @@
 # --- Metric calculation related functions ---
 import pandas as pd
+# pip install nba_api
+from nba_api.stats.static import teams
+
+def team_id_to_name(tid):
+    nba_teams = teams.get_teams()
+    team_lookup = {team['id']: team['full_name'] for team in nba_teams}
+    return str(team_lookup.get(tid))
 
 def abbreviation_to_position(abbr: str) -> str:
     positions = {
@@ -17,8 +24,8 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
     player_season_df = players_df.query("Player_Name == @selected_player & SEASON_ID == @season")
 
     return {
-        "PlayerID": player_season_df["Player_ID"].iloc[0],
-        "Team": player_season_df["Team"].iloc[0],
+        "PlayerID": player_season_df["PLAYER_ID"].iloc[0],
+        "Team": team_id_to_name(player_season_df["TEAM_ID"].iloc[0]),
         "Position": abbreviation_to_position(player_season_df["Position"].iloc[0]),
         "Age": round(player_season_df["PLAYER_AGE"].iloc[0]),
         "Weight": pounds_to_kg(pd.to_numeric(player_season_df["Weight"]).iloc[0]),
