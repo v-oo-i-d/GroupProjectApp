@@ -53,8 +53,11 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
     }
 
 def feet_inches_to_cm(hgt: str) -> float:
-    feet, inches = map(int, hgt.split("-"))
-    return round((feet * 12 + inches) * 2.54, 2)
+    try:
+        feet, inches = map(int, hgt.split("-"))
+        return round((feet * 12 + inches) * 2.54, 2)
+    except:
+        return hgt
 
 def pounds_to_kg(lbs: float) -> float:
     return round(lbs / 2.205, 1)
