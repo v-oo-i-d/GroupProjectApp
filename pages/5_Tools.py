@@ -1,17 +1,18 @@
 import streamlit as st
-from metrics import feet_inches_to_cm, pounds_to_kg
 import pandas as pd
+from metrics import feet_inches_to_cm, pounds_to_kg
 import random
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import NearestNeighbors
 
-st.set_page_config(page_title="Predictor Tools", page_icon="🔧")
+st.set_page_config(page_title="Tools", page_icon="🔧")
 
 # Gather relevant data
 players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv")
 games_df = pd.read_csv("./data/NBA_Regular_And_Playoff_Games.csv")
 
-st.write("# Predictor Tools")
+st.write("# Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
 
 def create_player_pairs() -> list:
@@ -63,8 +64,53 @@ def create_features(p1: pd.Series, p2: pd.Series) -> dict:
         "ast_diff": p1["AST"] - p2["AST"],
     }
 
+#TODO: add to notebook
 with similar_players_tab:
-    pass
+    # Select a player
+    selected_player = st.selectbox(
+        "Search for a player:",
+        placeholder="Search",
+        options=players_df["Player_Name"].dropna().sort_values().unique().tolist()
+    )
+
+    feature_cols = ["GP", "GS", "MIN", "FGM", "FGA",
+                     "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM",
+                     "FTA", "FT_PCT", "OREB", "DREB", "REB",
+                     "AST", "STL", "BLK", "TOV", "PF", "PTS"]
+
+    X = players_df[feature_cols]
+    y = players_df["PLAYER_ID"]
+
+    X_player = pd.DataFrame([players_df.query(f"Player_Name == '{selected_player}'")[feature_cols].mean()], columns=feature_cols)
+
+    # Traint the model
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    nn = NearestNeighbors(n_neighbors=12, metric='euclidean') .fit(X_train, y_train)
+
+    # Find similar players
+    distances, indices = nn.kneighbors(X_player)
+    similar_players = players_df.iloc[indices[0]]
+    similar_players = similar_players[similar_players["Player_Name"] != selected_player]
+
+    st.subheader("Most Similar Players")
+
+    c1, c2, c3 = st.columns(3)
+    cols = [c1, c2, c3]
+
+    player_ids = similar_players["PLAYER_ID"].tolist()
+
+    for idx, player_id in enumerate(player_ids):
+        col = cols[idx % 3]  # cycle through c1, c2, c3
+        with col:
+            with st.container(border=True):
+                player_name = players_df.query('PLAYER_ID == @player_id').iloc[0]["Player_Name"]
+                st.markdown(f"""
+                <div style='display:flex;flex-direction:column;justify-content:center;align-items:center'>
+                    <p>{player_name}<span style='color:grey'> {player_id} </span></p>
+                    <a style='padding:0.2em 1em;text-decoration:none;border:1px solid white;border-radius:0.5em;color:white' href='/Player_Dashboards?id={player_id}'>View</a>
+                    <img src='https://cdn.nba.com/headshots/nba/latest/1040x760/{player_id}.png'>
+                </div>
+                """, unsafe_allow_html=True)
 
 #TODO: add to notebook
 with player_vs_player_tab:
@@ -102,8 +148,8 @@ with player_vs_player_tab:
     with plr1:
         st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
         plr1_age = st.select_slider("Age", key="plr1_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr1_height = st.select_slider("Height", key="plr1_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
-        plr1_weight = st.select_slider("Weight", key="plr1_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
+        plr1_height = st.select_slider("Height (cm)", key="plr1_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
+        plr1_weight = st.select_slider("Weight (kg)", key="plr1_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
         plr1_rebounds = st.select_slider("Rebounds", key="plr1_rebounds", options=rebound_range, value=rebound_range[-1]//2)
         plr1_assists = st.select_slider("Assists", key="plr1_assists", options=assist_range, value=assist_range[-1]//2)
         plr1_blocks = st.select_slider("Blocks", key="plr1_blocks", options=blocks_range, value=blocks_range[-1]//2)
@@ -114,8 +160,8 @@ with player_vs_player_tab:
     with plr2:
         st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
         plr2_age = st.select_slider("Age", key="plr2_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr2_height = st.select_slider("Height", key="plr2_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
-        plr2_weight = st.select_slider("Weight", key="plr2_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
+        plr2_height = st.select_slider("Height (cm)", key="plr2_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
+        plr2_weight = st.select_slider("Weight (kg)", key="plr2_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
         plr2_rebounds = st.select_slider("Rebounds", key="plr2_rebounds", options=rebound_range, value=rebound_range[-1]//2)
         plr2_assists = st.select_slider("Assists", key="plr2_assists", options=assist_range, value=assist_range[-1]//2)
         plr2_blocks = st.select_slider("Blocks", key="plr2_blocks", options=blocks_range, value=blocks_range[-1]//2)

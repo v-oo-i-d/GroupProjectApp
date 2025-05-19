@@ -12,11 +12,30 @@ players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv
 st.write("# Player Dashboards")
 st.divider()
 
-# Select a player
-selected_player = st.selectbox("Search for a player:",
-                     placeholder="Search",
-                     options=players_df["Player_Name"].dropna().sort_values().unique().tolist())
+# Get selected player by URL ID
+url_player_id = st.query_params.get("id", None)
 
+# Try to find player name with that ID
+preselect_player = None
+if url_player_id:
+    try:
+        match = players_df[players_df["PLAYER_ID"] == int(url_player_id)]
+        if not match.empty:
+            preselect_player = match["Player_Name"].iloc[0]
+    except ValueError:
+        pass
+
+player_names = players_df["Player_Name"].dropna().sort_values().unique().tolist()
+default_index = player_names.index(preselect_player) if preselect_player in player_names else 0
+
+selected_player = st.selectbox(
+    "Search for a player:",
+    options=player_names,
+    index=default_index
+)
+
+player_id = players_df.query("Player_Name == @selected_player")["PLAYER_ID"].iloc[0]
+st.query_params["id"] = player_id
 
 if selected_player:
     with st.container(border=True):
