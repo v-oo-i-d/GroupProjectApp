@@ -30,7 +30,6 @@ def get_player_metrics(players_df: pd.DataFrame, selected_player: str, season: s
         "Age": round(player_season_df["PLAYER_AGE"].iloc[0]),
         "Weight": pounds_to_kg(pd.to_numeric(player_season_df["Weight"]).iloc[0]),
         "Height": feet_inches_to_cm(player_season_df["Height"].iloc[0]),
-        "Country": player_season_df["Country"].iloc[0],
 
         "GamesPlayed": player_season_df["GP"].iloc[0],
         "MinutesPlayed": round(player_season_df["MIN"].iloc[0]),

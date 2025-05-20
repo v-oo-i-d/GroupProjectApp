@@ -9,7 +9,7 @@ from sklearn.neighbors import NearestNeighbors
 st.set_page_config(page_title="Tools", page_icon="🔧")
 
 # Gather relevant data
-players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv")
+players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025csv")
 games_df = pd.read_csv("./data/NBA_Regular_And_Playoff_Games.csv")
 
 st.write("# Tools")
@@ -33,13 +33,13 @@ def create_player_pairs() -> list:
 def calculate_hypothetical_winner(p1: pd.Series, p2: pd.Series) -> pd.Series:
     def score_player(p: pd.Series) -> float:
         return (
-            0.3 * p.get("Age", 0) +
-            0.3 * feet_inches_to_cm(p.get("Height", 0)) +
-            0.3 * p.get("Weight", 0) +
-            0.7 * p.get("REB", 0) +
-            0.7 * p.get("AST", 0) +
-            0.7 * p.get("STL", 0) +
-            0.7 * p.get("BLK", 0) -
+            0.5 * p.get("Age", 0) +
+            0.8 * feet_inches_to_cm(p.get("Height", 0)) +
+            0.8 * p.get("Weight", 0) +
+            0.9 * p.get("REB", 0) +
+            0.9 * p.get("AST", 0) +
+            0.9 * p.get("STL", 0) +
+            0.9 * p.get("BLK", 0) -
             1.0 * p.get("FG_PCT", 0) +
             1.0 * p.get("FG3_PCT", 0) +
             1.0 * p.get("FT_PCT", 0)

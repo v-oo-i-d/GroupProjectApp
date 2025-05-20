@@ -6,7 +6,7 @@ import altair as alt
 st.set_page_config(page_title="Player Dashboard", page_icon="👤")
 
 # Gather players
-players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025_Cleaned.csv", index_col=0).reset_index(drop=True)
+players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025.csv", index_col=0).reset_index(drop=True)
 
 
 st.write("# Player Dashboards")
@@ -85,7 +85,6 @@ if selected_player:
             a1.metric("Age", current_season_metrics.get('Age'), border=True)
             a2.metric("Height (m)", round(current_season_metrics.get('Height') / 100, 2), border=True)
             a3.metric("Weight (kg)", current_season_metrics.get('Weight'), border=True)
-            a4.metric("Country", current_season_metrics.get('Country'), border=True)
             st.divider()
 
 
