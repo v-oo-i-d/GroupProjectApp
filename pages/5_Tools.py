@@ -9,15 +9,17 @@ from sklearn.neighbors import NearestNeighbors
 st.set_page_config(page_title="Tools", page_icon="🔧")
 
 # Gather relevant data
-players_df = pd.read_csv("./data/NBA_Player_Info_And_Stats_2014_2025csv")
-games_df = pd.read_csv("./data/NBA_Regular_And_Playoff_Games.csv")
+team_stats_df = pd.read_csv("./data/Cleaned_NBA_Per_Game_Stats_2015_2024.csv")
+regular_df = pd.read_csv("./data/NBA_Regular_Season_Games_2015_2024.csv")
+playoff_df = pd.read_csv("./data/NBA_Playoff_Games_2015_2024.csv")
+all_games_df = pd.concat([regular_df, playoff_df])
 
 st.write("# Tools")
 similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
 
 def create_player_pairs() -> list:
     pairs = list()
-    n = len(players_df)
+    n = len(team_stats_df)
     sample_size = 1000 # Pair count
 
     while len(pairs) < sample_size:
@@ -25,8 +27,8 @@ def create_player_pairs() -> list:
         if i > j:
             i, j = j, i  # avoid duplicates
         pairs.append((
-            players_df.iloc[i],
-            players_df.iloc[j]
+            team_stats_df.iloc[i],
+            team_stats_df.iloc[j]
         ))
     return pairs
 
@@ -34,15 +36,13 @@ def calculate_hypothetical_winner(p1: pd.Series, p2: pd.Series) -> pd.Series:
     def score_player(p: pd.Series) -> float:
         return (
             0.5 * p.get("Age", 0) +
-            0.8 * feet_inches_to_cm(p.get("Height", 0)) +
-            0.8 * p.get("Weight", 0) +
-            0.9 * p.get("REB", 0) +
+            0.9 * p.get("TRB", 0) +
             0.9 * p.get("AST", 0) +
             0.9 * p.get("STL", 0) +
             0.9 * p.get("BLK", 0) -
-            1.0 * p.get("FG_PCT", 0) +
-            1.0 * p.get("FG3_PCT", 0) +
-            1.0 * p.get("FT_PCT", 0)
+            1.0 * p.get("FG%", 0) +
+            1.0 * p.get("3P%", 0) +
+            1.0 * p.get("FT%", 0)
         )
 
     score1 = score_player(p1)
@@ -57,11 +57,13 @@ def calculate_hypothetical_winner(p1: pd.Series, p2: pd.Series) -> pd.Series:
 
 def create_features(p1: pd.Series, p2: pd.Series) -> dict:
     return {
-        "age_diff": p1["PLAYER_AGE"] - p2["PLAYER_AGE"],
-        "height_diff": feet_inches_to_cm(p1["Height"]) - feet_inches_to_cm(p2["Height"]),
-        "weight_diff": p1["Weight"] - p2["Weight"],
-        "reb_diff": p1["REB"] - p2["REB"],
+        "age_diff": p1["Age"] - p2["Age"],
+        "reb_diff": p1["TRB"] - p2["TRB"],
         "ast_diff": p1["AST"] - p2["AST"],
+        "blk_diff": p1["BLK"] - p2["BLK"],
+        "fg%_diff": p1["FG%"] - p2["FG%"],
+        "3p%_diff": p1["3P%"] - p2["3P%"],
+        "ft%_diff": p1["FT%"] - p2["FT%"],
     }
 
 #TODO: add to notebook
@@ -70,47 +72,40 @@ with similar_players_tab:
     selected_player = st.selectbox(
         "Search for a player:",
         placeholder="Search",
-        options=players_df["Player_Name"].dropna().sort_values().unique().tolist()
+        options=team_stats_df["Player"].dropna().sort_values().unique().tolist()
     )
 
-    feature_cols = ["GP", "GS", "MIN", "FGM", "FGA",
-                     "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM",
-                     "FTA", "FT_PCT", "OREB", "DREB", "REB",
+    feature_cols = ["G", "GS", "MP", "FG", "FGA",
+                     "FG%", "3P", "3PA", "3P%", "FT",
+                     "FTA", "FT%", "ORB", "DRB", "TRB",
                      "AST", "STL", "BLK", "TOV", "PF", "PTS"]
 
-    X = players_df[feature_cols]
-    y = players_df["PLAYER_ID"]
+    valid_rows = team_stats_df[feature_cols].dropna().index
+    X = team_stats_df.loc[valid_rows, feature_cols]
+    y = team_stats_df.loc[valid_rows, "Player"]
 
-    X_player = pd.DataFrame([players_df.query(f"Player_Name == '{selected_player}'")[feature_cols].mean()], columns=feature_cols)
+    X_player = pd.DataFrame([team_stats_df.query(f"Player == '{selected_player}'")[feature_cols].mean()], columns=feature_cols)
 
     # Traint the model
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    nn = NearestNeighbors(n_neighbors=12, metric='euclidean') .fit(X_train, y_train)
-
-    # Find similar players
-    distances, indices = nn.kneighbors(X_player)
-    similar_players = players_df.iloc[indices[0]]
-    similar_players = similar_players[similar_players["Player_Name"] != selected_player]
+    nn = NearestNeighbors(n_neighbors=12, metric='euclidean').fit(X_train, y_train)
 
     st.subheader("Most Similar Players")
 
-    c1, c2, c3 = st.columns(3)
-    cols = [c1, c2, c3]
+    # Find similar players
+    distances, indices = nn.kneighbors(X_player)
+    similar_players = team_stats_df.iloc[indices[0]]
+    similar_players = similar_players[similar_players["Player"] != selected_player]
+    similar_player_names = similar_players["Player"].tolist()
 
-    player_ids = similar_players["PLAYER_ID"].tolist()
+    for idx, player_name in enumerate(similar_player_names):
+        with st.container(border=True):
+            plr, _, btn = st.columns([3, 5, 1])
+            with plr:
+                st.write(idx+1, player_name)
+            with btn:
+                st.link_button("View", url=f"/Player_Dashboards?player={player_name}")
 
-    for idx, player_id in enumerate(player_ids):
-        col = cols[idx % 3]  # cycle through c1, c2, c3
-        with col:
-            with st.container(border=True):
-                player_name = players_df.query('PLAYER_ID == @player_id').iloc[0]["Player_Name"]
-                st.markdown(f"""
-                <div style='display:flex;flex-direction:column;justify-content:center;align-items:center'>
-                    <p>{player_name}<span style='color:grey'> {player_id} </span></p>
-                    <a style='padding:0.2em 1em;text-decoration:none;border:1px solid white;border-radius:0.5em;color:white' href='/Player_Dashboards?id={player_id}'>View</a>
-                    <img src='https://cdn.nba.com/headshots/nba/latest/1040x760/{player_id}.png'>
-                </div>
-                """, unsafe_allow_html=True)
 
 #TODO: add to notebook
 with player_vs_player_tab:
@@ -120,36 +115,26 @@ with player_vs_player_tab:
 
     # Predictors
     age_range = list(range(
-        int(players_df["PLAYER_AGE"].min()),
-        int(players_df["PLAYER_AGE"].max()) + 1)
+        int(team_stats_df["Age"].min()),
+        int(team_stats_df["Age"].max()) + 1)
     )
-    height_range = list(range(
-        int(feet_inches_to_cm(players_df["Height"].min())),
-        int(feet_inches_to_cm(players_df["Height"].max())) + 1)
-    )
-    weight_range = list(range(
-        int(pounds_to_kg(players_df["Weight"].min())),
-        int(pounds_to_kg(players_df["Weight"].max()) + 1)
-    ))
     rebound_range = list(range(
-        int(players_df["REB"].min()),
-        int(players_df["REB"].max() + 1)
+        int(team_stats_df["TRB"].min()),
+        int(team_stats_df["TRB"].max() + 1)
     ))
     assist_range = list(range(
-        int(players_df["AST"].min()),
-        int(players_df["AST"].max() + 1)
+        int(team_stats_df["AST"].min()),
+        int(team_stats_df["AST"].max() + 1)
     ))
     blocks_range = list(range(
-        int(players_df["BLK"].min()),
-        int(players_df["BLK"].max() + 1)
+        int(team_stats_df["BLK"].min()),
+        int(team_stats_df["BLK"].max() + 1)
     ))
 
     # Inputs
     with plr1:
         st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
         plr1_age = st.select_slider("Age", key="plr1_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr1_height = st.select_slider("Height (cm)", key="plr1_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
-        plr1_weight = st.select_slider("Weight (kg)", key="plr1_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
         plr1_rebounds = st.select_slider("Rebounds", key="plr1_rebounds", options=rebound_range, value=rebound_range[-1]//2)
         plr1_assists = st.select_slider("Assists", key="plr1_assists", options=assist_range, value=assist_range[-1]//2)
         plr1_blocks = st.select_slider("Blocks", key="plr1_blocks", options=blocks_range, value=blocks_range[-1]//2)
@@ -160,8 +145,6 @@ with player_vs_player_tab:
     with plr2:
         st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
         plr2_age = st.select_slider("Age", key="plr2_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr2_height = st.select_slider("Height (cm)", key="plr2_height", options=height_range, value=(height_range[-1]+height_range[0])//2)
-        plr2_weight = st.select_slider("Weight (kg)", key="plr2_weight", options=weight_range, value=(weight_range[-1]+weight_range[0])//2)
         plr2_rebounds = st.select_slider("Rebounds", key="plr2_rebounds", options=rebound_range, value=rebound_range[-1]//2)
         plr2_assists = st.select_slider("Assists", key="plr2_assists", options=assist_range, value=assist_range[-1]//2)
         plr2_blocks = st.select_slider("Blocks", key="plr2_blocks", options=blocks_range, value=blocks_range[-1]//2)
@@ -172,15 +155,13 @@ with player_vs_player_tab:
 
     # Create fake players
     p1 = pd.DataFrame({
-        "PLAYER_AGE": [plr1_age], "Height": [plr1_height], "Weight": [plr1_weight],
-        "REB": [plr1_rebounds], "AST": [plr1_assists], "BLK": [plr1_blocks],
-        "FG_PCT": [plr1_fgpct], "FG3_PCT": [plr1_fg3pct], "FT_PCT": [plr1_ftpct],
+        "Age": [plr1_age], "TRB": [plr1_rebounds], "AST": [plr1_assists], "BLK": [plr1_blocks],
+        "FG%": [plr1_fgpct], "3P%": [plr1_fg3pct], "FT%": [plr1_ftpct],
     }).iloc[0]
 
     p2 = pd.DataFrame({
-        "PLAYER_AGE": [plr2_age], "Height": [plr2_height], "Weight": [plr2_weight],
-        "REB": [plr2_rebounds], "AST": [plr2_assists], "BLK": [plr1_blocks],
-        "FG_PCT": [plr2_fgpct], "FG3_PCT": [plr2_fg3pct], "FT_PCT": [plr2_ftpct],
+        "Age": [plr2_age], "TRB": [plr2_rebounds], "AST": [plr2_assists], "BLK": [plr1_blocks],
+        "FG%": [plr2_fgpct], "3P%": [plr2_fg3pct], "FT%": [plr2_ftpct],
     }).iloc[0]
 
 
@@ -209,13 +190,13 @@ with player_vs_player_tab:
     with st.container(border=True):
         if prediction == 1:
             st.markdown("""
-                <p style='text-align:center;'>Predicted Winner:</p>
-                <b style='display:block;font-size:3rem;text-align:center;margin:0 auto'>Player 1</b>
+                <p style='text-align:center;margin:0'>Predicted Winner:</p>
+                <div style='font-size:3rem;text-align:center;margin:0 auto 0.2em auto'>Player 1</b>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
-                <p style='text-align:center;'>Predicted Winner:</p>
-                <div style='font-size:3rem;text-align:center;margin:0 auto'>Player 2</b>
+                <p style='text-align:center;margin:0'>Predicted Winner:</p>
+                <div style='font-size:3rem;text-align:center;margin:0 auto 0.2em auto'>Player 2</b>
             """, unsafe_allow_html=True)
 
 
@@ -224,7 +205,7 @@ with game_prediction_tab:
     st.write("(Classification problem)")
 
     team1, _, team2 = st.columns([3, 0.2, 3])
-    teams = games_df["TEAM_NAME"].sort_values().unique()
+    teams = all_games_df["TEAM_NAME"].sort_values().unique()
 
     with team1:
         st.markdown("<h1 style='text-align:center'>Team 1</h1></div>", unsafe_allow_html=True)
