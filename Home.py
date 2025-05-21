@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Overview", page_icon="🎯", layout="wide")
+st.set_page_config(page_title="Home", layout="wide")
 
 st.header("Exploring NBA Statistics")
 

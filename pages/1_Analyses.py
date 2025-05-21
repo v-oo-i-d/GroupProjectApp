@@ -2,22 +2,39 @@ import streamlit as st
 
 st.set_page_config(page_title="Analyses", page_icon="🔎", layout="wide")
 
-st.write("# Intro")
-st.write("# Analysis")
-st.write("## Section 1")
-st.write("### 1a")
-st.write("#### 1aa")
-st.write("#### 1ab")
-st.write("## Section 2")
-st.write("### 2a")
-st.write("#### 2aa")
-st.write("## Section 3")
-st.write("### 3a")
-st.write("#### 3aa")
-st.write("# Conclusion")
+st.header("Analyses")
+st.write("""
+    This page's goal is to go into greater depth regarding the steps that are taken to transform our cleaned NBA performance datasets into a form that is analytically ready. 
+    These processes typically include, but are not limited to, dealing with missing values, inconsistencies in formats, duplicate records, and correcting data types. 
+    In addition to demonstrating our wrangling skills, this part describes the approach we utilised to formulate and examine many research problems. 
+    These questions prompted our investigation into player performance patterns, team statistics, and other relevant insights, all backed by well-presented data visualisations and summaries.
+""")
+st.divider()
+
+st.header("Regression")
+st.write("""
+    Kobe's section
+""")
+
+
+st.header("Classification")
+st.write("""
+    Michael's section
+""")
+
+st.header("Time Series")
+st.write("""
+    A.J's section
+""")
+
+st.header("Clustering")
+st.write("""
+    Amanda's section
+""")
 
 with st.sidebar:
     st.write("## Contents")
+    # Table of contents
     st.markdown("""
         <style>
             .toc a {
@@ -33,7 +50,6 @@ with st.sidebar:
                 opacity: 0.5;
             }
             .toc a.one {
-                font-weight: bold;
                 padding-left: 20px;
             }
             .toc a.two {
@@ -48,18 +64,9 @@ with st.sidebar:
         </style>
         
         <div class="toc">
-            <a class="one" href="#intro">Intro</a>
-            <a class="one" href="#analysis">Analysis</a>
-                <a class="two" href="#section-1">Section 1</a>
-                     <a class="three" href="#1a">1a</a>
-                         <a class="four" href="#1aa">1aa</a>
-                         <a class="four" href="#1ab">1ab</a>
-                <a class="two" href="#section-2">Section 2</a>
-                     <a class="three" href="#2a">2a</a>
-                         <a class="four" href="#2aa">2aa</a>
-                <a class="two" href="#section-3">Section 3</a>
-                     <a class="three" href="#3a">3a</a>
-                         <a class="four" href="#3aa">3aa</a>
-            <a class="one" href="#conclusion">Conclusion</a>
+            <a class="one" href="#regression">Regression</a>
+            <a class="one" href="#classification">Classification</a>
+            <a class="one" href="#timeseries">Time Series</a>
+            <a class="one" href="#clustering">Clustering</a>
         </div>
         """, unsafe_allow_html=True)

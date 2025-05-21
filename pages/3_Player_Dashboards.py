@@ -3,7 +3,7 @@ from metrics import *
 import pandas as pd
 import altair as alt
 
-st.set_page_config(page_title="Player Dashboard", page_icon="👤")
+st.set_page_config(page_title="Player Dashboards", page_icon="👤")
 
 # Gather players
 team_stats_df = pd.read_csv("./data/Cleaned_NBA_Per_Game_Stats_2015_2024.csv")
