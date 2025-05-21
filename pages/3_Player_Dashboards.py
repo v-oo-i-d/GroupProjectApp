@@ -24,15 +24,14 @@ if url_player_name:
     except ValueError:
         pass
 
-Players = team_stats_df["Player"].dropna().sort_values().unique().tolist()
-default_index = Players.index(preselect_player) if preselect_player in Players else 0
+unique_players = team_stats_df["Player"].dropna().sort_values().unique().tolist()
+default_index = unique_players.index(preselect_player) if preselect_player in unique_players else 0
 
 selected_player = st.selectbox(
     "Search for a player:",
-    options=Players,
+    options=unique_players,
     index=default_index
 )
-
 st.query_params["player"] = team_stats_df.query("Player == @selected_player")["Player"].iloc[0]
 
 if selected_player:
@@ -43,30 +42,17 @@ if selected_player:
         selected_season = st.segmented_control("Season", options=seasons, default=default_season)
 
         try:
+            # Get current season metrics
             selected_index = seasons.index(selected_season)
             current_season_metrics = get_player_metrics(team_stats_df, selected_player, selected_season)
-            previous_season_metrics = None
 
-            if len(seasons) > 1:
-                try:
-                    previous_season_metrics = get_player_metrics(team_stats_df, selected_player, seasons[selected_index + 1])
-                except IndexError:
-                    pass
-
-
-            # Header
-            st.header(selected_player)
-            st.divider()
-
-
-            # Get selected seasons' metrics
+            previous_season_metrics = {}
             player_metric_diffs = {}
-            for season in seasons:
-                if selected_season == season:
-                    current_season_metrics = get_player_metrics(team_stats_df, selected_player, season)
-                else:
-                    if previous_season_metrics:
-                        player_metric_diffs = calculate_metric_diffs(current_season_metrics, previous_season_metrics)
+
+            # Get previous season metrics
+            if selected_index + 1 < len(seasons):
+                previous_season_metrics = get_player_metrics(team_stats_df, selected_player, seasons[selected_index + 1])
+                player_metric_diffs = calculate_metric_diffs(current_season_metrics, previous_season_metrics)
 
 
             # Basic Info
@@ -79,32 +65,30 @@ if selected_player:
 
             # Game Stats
             st.markdown("<h3>Game Stats</h3>", unsafe_allow_html=True)
-            gp = player_metric_diffs.get("GamesPlayed", None)
-            mp = player_metric_diffs.get("MinutesPlayed", None)
+            gp = player_metric_diffs.get("GamesPlayed", 0)
+            mp = player_metric_diffs.get("MinutesPlayed", 0)
             b1, b2 = st.columns(2)
-            b1.metric("Games Played", current_season_metrics.get('GamesPlayed', 0),
-                      border=True, delta=gp)
-            b2.metric("Minutes Played", current_season_metrics.get('MinutesPlayed', 0),
-                      border=True, delta=mp)
+            b1.metric("Games Played", current_season_metrics.get('GamesPlayed', 0), border=True, delta=gp)
+            b2.metric("Minutes Played", current_season_metrics.get('MinutesPlayed', 0), border=True, delta=mp)
             st.divider()
 
 
             # Field Goals
             st.markdown("<h3>Field Goals</h3>", unsafe_allow_html=True)
-            fgm = round(player_metric_diffs.get("FieldGoalsMade"), 1) if player_metric_diffs.get("FieldGoalsMade", None) else None
-            fga = round(player_metric_diffs.get("FieldGoalsAttempted"), 1) if player_metric_diffs.get("FieldGoalsAttempted", None) else None
-            fgr = round(player_metric_diffs.get("FieldGoalPercentage"), 1) if player_metric_diffs.get("FieldGoalPercentage", None) else None
+            fgm = round(player_metric_diffs.get("FieldGoalsMade"), 1) if player_metric_diffs.get("FieldGoalsMade", None) else 0
+            fga = round(player_metric_diffs.get("FieldGoalsAttempted"), 1) if player_metric_diffs.get("FieldGoalsAttempted", None) else 0
+            fgr = round(player_metric_diffs.get("FieldGoalPercentage"), 1) if player_metric_diffs.get("FieldGoalPercentage", None) else 0
             c1, c2, c3 = st.columns(3)
             c1.metric("Made", current_season_metrics.get("FieldGoalsMade", 0), border=True, delta=fgm)
             c2.metric("Attempted", current_season_metrics.get("FieldGoalsAttempted", 0), border=True, delta=fga)
-            c3.metric("Rate (%)", round(current_season_metrics.get("FieldGoalPercentage", 0), 1), border=True, delta=fgr)
+            c3.metric("Rate (%)", current_season_metrics.get("FieldGoalPercentage", 1), border=True, delta=fgr)
 
 
             # Three Pointers
             st.markdown("<h3>Three Pointers</h3>", unsafe_allow_html=True)
-            tpm = round(player_metric_diffs.get("ThreePointersMade"), 1) if player_metric_diffs.get("ThreePointersMade", None) else None
-            tpa = round(player_metric_diffs.get("ThreePointersAttempted"), 1) if player_metric_diffs.get("ThreePointersAttempted", None) else None
-            tpr = round(player_metric_diffs.get("ThreePointersPercentage"), 1) if player_metric_diffs.get("ThreePointersPercentage", None) else None
+            tpm = round(player_metric_diffs.get("ThreePointersMade"), 1) if player_metric_diffs.get("ThreePointersMade", None) else 0
+            tpa = round(player_metric_diffs.get("ThreePointersAttempted"), 1) if player_metric_diffs.get("ThreePointersAttempted", None) else 0
+            tpr = round(player_metric_diffs.get("ThreePointersPercentage"), 1) if player_metric_diffs.get("ThreePointersPercentage", None) else 0
             c1, c2, c3 = st.columns(3)
             c1.metric("Made", current_season_metrics.get("ThreePointersMade", 0), border=True, delta=tpm)
             c2.metric("Attempted", current_season_metrics.get("ThreePointersAttempted", 0), border=True, delta=tpa)
@@ -113,9 +97,9 @@ if selected_player:
 
             # Free Throws
             st.markdown("<h3>Free Throws</h3>", unsafe_allow_html=True)
-            ftm = round(player_metric_diffs.get("FreeThrowsMade"), 1) if player_metric_diffs.get("FreeThrowsMade",                                                                                         None) else None
-            fta = round(player_metric_diffs.get("FreeThrowsAttempted"), 1) if player_metric_diffs.get("FreeThrowsAttempted", None) else None
-            ftr = round(player_metric_diffs.get("FreeThrowsPercentage"), 1) if player_metric_diffs.get("FreeThrowsPercentage", None) else None
+            ftm = round(player_metric_diffs.get("FreeThrowsMade"), 1) if player_metric_diffs.get("FreeThrowsMade", None) else 0
+            fta = round(player_metric_diffs.get("FreeThrowsAttempted"), 1) if player_metric_diffs.get("FreeThrowsAttempted", None) else 0
+            ftr = round(player_metric_diffs.get("FreeThrowsPercentage"), 1) if player_metric_diffs.get("FreeThrowsPercentage", None) else 0
             c1, c2, c3 = st.columns(3)
             c1.metric("Made", current_season_metrics.get("FreeThrowsMade", 0), border=True, delta=ftm)
             c2.metric("Attempted", current_season_metrics.get("FreeThrowsAttempted", 0), border=True, delta=fta)
@@ -124,11 +108,14 @@ if selected_player:
 
 
             metrics_to_plot = ["FG%", "FT%", "3P%"]
-            stat_renames = {"FG%": "Field Goals", "FT%": "Free Throws", "3P%": "Three-Pointers"}
+            team_stats_df[metrics_to_plot] = team_stats_df[metrics_to_plot].apply(pd.to_numeric, errors='coerce')
 
             # Calculate metric means per season
-            season_avg_df = team_stats_df.query("Player == @selected_player").groupby("Season")[
-                metrics_to_plot].mean().reset_index()
+            season_avg_df = (team_stats_df
+                             .query("Player == @selected_player")
+                             .groupby("Season")[metrics_to_plot]
+                             .mean()
+                             .reset_index())
 
             # Melt to long format
             melted_avg_df = season_avg_df.melt(
@@ -136,7 +123,7 @@ if selected_player:
                 var_name="Metric",
                 value_name="Average"
             )
-            melted_avg_df["Metric"] = melted_avg_df["Metric"].map(stat_renames)
+            melted_avg_df["Metric"] = melted_avg_df["Metric"].map({"FG%": "Field Goals", "FT%": "Free Throws", "3P%": "3-Pointers"})
             melted_avg_df["Average"] *= 100
 
             chart = alt.Chart(melted_avg_df).mark_line(point=True).encode(

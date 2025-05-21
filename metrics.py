@@ -3,12 +3,12 @@ import pandas as pd
 # pip install nba_api
 from nba_api.stats.static import teams
 
-def team_id_to_name(tid):
+def team_id_to_name(tid: int) -> str:
     nba_teams = teams.get_teams()
     team_lookup = {team['id']: team['full_name'] for team in nba_teams}
     return str(team_lookup.get(tid))
 
-def team_abbr_to_name(abbr):
+def team_abbr_to_name(abbr: str) -> str:
     nba_teams = teams.get_teams()
     team_lookup = {team['abbreviation']: team['full_name'] for team in nba_teams}
     return str(team_lookup.get(abbr))
@@ -29,26 +29,26 @@ def get_player_metrics(team_stats_df: pd.DataFrame, selected_player: str, season
     return {
         "Team": team_id_to_name(player_season_df["Team"].iloc[0]),
         "Position": abbreviation_to_position(player_season_df["Pos"].iloc[0]),
-        "Age": int(player_season_df["Age"].iloc[0]),
+        "Age": round(player_season_df["Age"].apply(pd.to_numeric).iloc[0]),
 
         "GamesPlayed": int(player_season_df["G"].iloc[0]),
-        "MinutesPlayed": int(player_season_df["MP"].iloc[0]),
+        "MinutesPlayed": round(float(player_season_df["MP"].iloc[0]), 1),
 
-        "FieldGoalsMade": player_season_df["FG"].iloc[0],
-        "FieldGoalsAttempted": player_season_df["FGA"].iloc[0],
-        "FieldGoalPercentage": player_season_df["FG%"].iloc[0] * 100,
+        "FieldGoalsMade": round(float(player_season_df["FG"].iloc[0]), 1),
+        "FieldGoalsAttempted": round(float(player_season_df["FGA"].iloc[0]), 1),
+        "FieldGoalPercentage": round(float(player_season_df["FG%"].iloc[0]) * 100),
 
-        "ThreePointersMade": player_season_df["3P"].iloc[0],
-        "ThreePointersAttempted": player_season_df["3PA"].iloc[0],
-        "ThreePointersPercentage": player_season_df["3P%"].iloc[0] * 100,
+        "ThreePointersMade": round(float(player_season_df["3P"].iloc[0]), 1),
+        "ThreePointersAttempted": round(float(player_season_df["3PA"].iloc[0]), 1),
+        "ThreePointersPercentage": round(float(player_season_df["3P%"].iloc[0]) * 100),
 
-        "FreeThrowsMade": player_season_df["FT"].iloc[0],
-        "FreeThrowsAttempted": player_season_df["FTA"].iloc[0],
-        "FreeThrowsPercentage": player_season_df["FT%"].iloc[0] * 100,
+        "FreeThrowsMade": round(float(player_season_df["FT"].iloc[0]), 1),
+        "FreeThrowsAttempted": round(float(player_season_df["FTA"].iloc[0]), 1),
+        "FreeThrowsPercentage": round(float(player_season_df["FT%"].iloc[0]) * 100),
 
-        "Assists": int(player_season_df["AST"].iloc[0]),
-        "Steals": int(player_season_df["STL"].iloc[0]),
-        "Blocks": int(player_season_df["BLK"].iloc[0])
+        "Assists": round(float(player_season_df["AST"].iloc[0]), 1),
+        "Steals": round(float(player_season_df["STL"].iloc[0]), 1),
+        "Blocks": round(float(player_season_df["BLK"].iloc[0]), 1)
     }
 
 def feet_inches_to_cm(hgt: str) -> float:
@@ -72,7 +72,7 @@ def calculate_metric_diffs(current: dict, previous: dict) -> dict:
     for key in current:
         if key in previous:
             try:
-                diffs[key] = current[key] - previous[key]
+                diffs[key] = round(current[key] - previous[key], 1)
             except TypeError:
                 continue
     return diffs
