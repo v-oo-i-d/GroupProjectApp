@@ -82,7 +82,13 @@ with similar_players_tab:
     X = team_stats_df.loc[valid_rows, feature_cols]
     y = team_stats_df.loc[valid_rows, "Player"]
 
-    X_player = pd.DataFrame([team_stats_df.query(f"Player == '{selected_player}'")[feature_cols].mean()], columns=feature_cols)
+    # Check for valid data
+    player_data = team_stats_df.query(f"Player == '{selected_player}'")[feature_cols].dropna()
+    if not player_data.empty:
+        X_player = pd.DataFrame([player_data.mean()], columns=feature_cols)
+    else:
+        st.warning(f"Not enough data available for {selected_player}")
+        st.stop()
 
     # Traint the model
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -100,7 +106,12 @@ with similar_players_tab:
         with st.container(border=True):
             plr, _, btn = st.columns([3, 5, 1])
             with plr:
-                st.write(idx+1, player_name)
+                st.markdown(f"""
+                    <div style='height:2.5em;margin:0;display:flex;flex-direction:column;justify-content:center'>
+                        <span style='margin-right:1em;color:grey'>{idx+1}</span>
+                        {player_name}
+                    </div>
+                """, unsafe_allow_html=True)
             with btn:
                 st.link_button("View", url=f"/Player_Dashboards?player={player_name}")
 

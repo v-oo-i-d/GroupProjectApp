@@ -149,7 +149,8 @@ if selected_player:
                       border=True, delta=player_metric_diffs.get("Blocks"))
             st.divider()
         except ValueError:
-            st.write("Please select a valid season.")
+            st.warning("Please select a valid season")
+            st.stop()
 
 
         # Display raw data as table
