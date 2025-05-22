@@ -478,7 +478,7 @@ with st.sidebar:
         <div class="toc">
             <a href="#regression">Regression</a>
             <a href="#classification">Classification</a>
-            <a href="#timeseries">Time Series</a>
+            <a href="#time-series">Time Series</a>
             <a href="#clustering">Clustering</a>
         </div>
         """, unsafe_allow_html=True)

@@ -45,11 +45,8 @@ st.markdown("""
     Working with real world sports data, especially from an immensely popular sport like basketball, is either a hit or miss when it comes to extracting data. 
     Across seasons, data can vary in format, contain missing or inconsistent values, and often includes an overwhelming number of features and player records. 
     These issues can hinder the ability to draw insights or use the data effectively for deeper analysis or visualization.
-    <br><br>
     The primary goal of this project was to take raw NBA performance data and turn it into something clean, structured, and ready for analysis. 
-    This involved, honestly, very minimal inconsistency resolving and cleaning.
-    <br><br>
-    The work here differs in that it focuses solely on actual data wrangling stages particular to sports analytics. 
+    This involved, honestly, very minimal inconsistency resolving and cleaning. The work here differs in that it focuses solely on actual data wrangling stages particular to sports analytics. 
     This project walks through all of the steps, from acquiring the data, cleaning it, potential feature engineering, and eventually visualization, 
     to demonstrate how the demands data preparation may lead to insightful findings and enable intricate modelling in the future.
 """, unsafe_allow_html=True)
