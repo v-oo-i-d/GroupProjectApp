@@ -42,7 +42,7 @@ st.markdown("""
     3. Calculate average metrics for every player in chosen team
     4. Calculate every players distance from the average
     5. Identify underperforming players using Z-score and label appropriately
-    6. Suggest better suited teams with KNN Classifier and plot
+    6. Suggest better suited teams with KNN Classifier
 """)
 
 st.markdown("##### Forming teams rosters")
@@ -258,10 +258,7 @@ colors = [
     "#b40426", "#da5948", "#f18e70", "#f7b89c", "#ead4c8",
     "#ced9ec", "#aac7fd", "#83a6fb", "#5d7ce6", "#3b4cc0"
 ]
-teams = [
-    "Miami Heat", "New Orleans Pelicans", "Detroit Pistons", "Indiana Pacers", "N/A",
-    "Minnesota Timberwolves", "Los Angeles Clippers", "Houston Rockets", "N/A", "N/A"
-]
+teams = ["MIA","NOP","DET","IND","BRK","MIN","LAC","HOU","PHO","CHO"]
 fig = go.Figure()
 cumulative = 0
 
@@ -387,12 +384,10 @@ st.code("""
     for name, clf in classifiers:
         train_model(clf)
 """)
-st.write("""
-    KNN Accuracy: ```71.0%```\n
-    Random Forest Accuracy: ```80.3%```\n
-    SVC Accuracy: ```75.2%```\n
-    Gradient Boosting Accuracy: ```80.2%```
-""")
+st.badge("KNN Accuracy: 71.0%", color="red")
+st.badge("Random Forest Accuracy: 80.3%", color="green")
+st.badge("SVC: 75.2%", color="orange")
+st.badge("Gradient Boosting Accuracy: 80.2%", color="orange")
 st.write("""
     K Nearest Neighbors (KNN) is a basic classification algorithm which makes predictions based on the similarity between data points. 
     KNN represents each game as a vector in multidimensional space; looking for the K most similar games using euclidean distance by default. 
