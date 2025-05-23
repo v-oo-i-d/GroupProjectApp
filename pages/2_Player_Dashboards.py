@@ -160,7 +160,6 @@ if selected_player:
                      .set_index("Season")
                      .sort_index(ascending=False))
 
-        players_display_df["Team"] = players_display_df["Team"].apply(team_abbr_to_name)
         players_display_df = players_display_df.rename(columns={
             "G": "Games Played", "MP": "Minutes Played",
             "FG": "Field Goals Made", "FGA": "Field Goals Attempted", "FG%": "Field Goals Rate",

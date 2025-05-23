@@ -50,13 +50,21 @@ st.markdown("""
     This project walks through all of the steps, from acquiring the data, cleaning it, potential feature engineering, and eventually visualization, 
     to demonstrate how the demands data preparation may lead to insightful findings and enable intricate modelling in the future.
 """, unsafe_allow_html=True)
+
 # Dataset Overview
 st.header("Dataset Overview")
+st.write("""
+    The data we are working with consists of 3 separate datasets, all originating from the NBA. 
+""")
+
 # Wrangling Methodology
 st.header("Wrangling Methodology")
+
 # Results & Evaluation
 st.header("Results & Evaluation")
+
 # Discussion
 st.header("Discussion")
+
 # Conclusion
 st.header("Conclusion")

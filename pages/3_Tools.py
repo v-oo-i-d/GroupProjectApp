@@ -63,7 +63,6 @@ def create_features(p1: pd.Series, p2: pd.Series) -> dict:
         "ft%_diff": p1["FT%"] - p2["FT%"],
     }
 
-#TODO: add to notebook
 with similar_players_tab:
     # Select a player
     selected_player = st.selectbox(
@@ -115,7 +114,6 @@ with similar_players_tab:
             with btn:
                 st.link_button("View", url=f"/Player_Dashboards?player={player_name}")
 
-#TODO: add to notebook
 with player_vs_player_tab:
     st.write("Who would come out on top in a 1v1 match? Enter player stats and let us predict the likely winner!")
 
@@ -137,22 +135,24 @@ with player_vs_player_tab:
 
     # Inputs
     with plr1:
-        st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
-        plr1_age = st.select_slider("Age", key="plr1_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr1_rebounds = st.select_slider("Rebounds", key="plr1_rebounds", options=rebound_range, value=rebound_range[-1]//2)
-        plr1_blocks = st.select_slider("Blocks", key="plr1_blocks", options=blocks_range, value=blocks_range[-1]//2)
-        plr1_fgpct = st.select_slider("Field Goal %", key="plr1_fgpct", options=range(0, 101), value=50)
-        plr1_fg3pct = st.select_slider("Three Pointer %", key="plr1_fg3pct", options=range(0, 101), value=50)
-        plr1_ftpct = st.select_slider("Free Throw %", key="plr1_ftpct", options=range(0, 101), value=50)
+        with st.container(border=True):
+            st.markdown("<h1 style='text-align:center'>Player 1</h1></div>", unsafe_allow_html=True)
+            plr1_age = st.select_slider("Age", key="plr1_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
+            plr1_rebounds = st.select_slider("Rebounds", key="plr1_rebounds", options=rebound_range, value=rebound_range[-1]//2)
+            plr1_blocks = st.select_slider("Blocks", key="plr1_blocks", options=blocks_range, value=blocks_range[-1]//2)
+            plr1_fgpct = st.select_slider("Field Goal %", key="plr1_fgpct", options=range(0, 101), value=50)
+            plr1_fg3pct = st.select_slider("Three Pointer %", key="plr1_fg3pct", options=range(0, 101), value=50)
+            plr1_ftpct = st.select_slider("Free Throw %", key="plr1_ftpct", options=range(0, 101), value=50)
 
     with plr2:
-        st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
-        plr2_age = st.select_slider("Age", key="plr2_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
-        plr2_rebounds = st.select_slider("Rebounds", key="plr2_rebounds", options=rebound_range, value=rebound_range[-1]//2)
-        plr2_blocks = st.select_slider("Blocks", key="plr2_blocks", options=blocks_range, value=blocks_range[-1]//2)
-        plr2_fgpct = st.select_slider("Field Goal %", key="plr2_fgpct", options=range(0, 101), value=50)
-        plr2_fg3pct = st.select_slider("Three Pointer %", key="plr2_fg3pct", options=range(0, 101), value=50)
-        plr2_ftpct = st.select_slider("Free Throw %", key="plr2_ftpct", options=range(0, 101), value=50)
+        with st.container(border=True):
+            st.markdown("<h1 style='text-align:center'>Player 2</h1></div>", unsafe_allow_html=True)
+            plr2_age = st.select_slider("Age", key="plr2_age", options=age_range, value=(age_range[-1]+age_range[0])//2)
+            plr2_rebounds = st.select_slider("Rebounds", key="plr2_rebounds", options=rebound_range, value=rebound_range[-1]//2)
+            plr2_blocks = st.select_slider("Blocks", key="plr2_blocks", options=blocks_range, value=blocks_range[-1]//2)
+            plr2_fgpct = st.select_slider("Field Goal %", key="plr2_fgpct", options=range(0, 101), value=50)
+            plr2_fg3pct = st.select_slider("Three Pointer %", key="plr2_fg3pct", options=range(0, 101), value=50)
+            plr2_ftpct = st.select_slider("Free Throw %", key="plr2_ftpct", options=range(0, 101), value=50)
 
 
     # Create fake players
@@ -188,16 +188,19 @@ with player_vs_player_tab:
     # Use the user inputted data to predict the winner
     example_features = create_features(p1, p2)
     prediction = rfc.predict(pd.DataFrame([example_features]))[0]
-    _, c, _ = st.columns([1,2,1])
+    _, c, _ = st.columns([1,3,1])
     with c:
-        with st.container(border=True):
-            if prediction == 1:
-                st.markdown("""
-                    <p style='text-align:center;margin:0'>Predicted Winner:</p>
-                    <div style='font-size:3rem;text-align:center;margin:0 auto 0.2em auto'>Player 1</b>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown("""
-                    <p style='text-align:center;margin:0'>Predicted Winner:</p>
-                    <div style='font-size:3rem;text-align:center;margin:0 auto 0.2em auto'>Player 2</b>
-                """, unsafe_allow_html=True)
+        if prediction == 1:
+            st.markdown("""
+                <div style="text-align: center; background-color: #111; border-radius: 10px; padding: 20px; margin-top: 30px; border: 2px solid #ff4b4b;">
+                    <h2 style="color: white;">🏆 Predicted Winner:</h2>
+                    <h1 style="color: #ff4b4b;">Player 1</h1>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+                <div style="text-align: center; background-color: #111; border-radius: 10px; padding: 20px; margin-top: 30px; border: 2px solid #ff4b4b;">
+                    <h2 style="color: white;">🏆 Predicted Winner:</h2>
+                    <h1 style="color: #ff4b4b;">Player 1</h1>
+                </div>
+            """, unsafe_allow_html=True)
