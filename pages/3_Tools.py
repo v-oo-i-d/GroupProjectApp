@@ -14,7 +14,9 @@ playoff_df = pd.read_csv("./data/Cleaned_NBA_Playoff_Games_2015_2024.csv")
 all_games_df = pd.read_csv("./data/Cleaned_NBA_All_Games_2015_2024.csv")
 
 st.write("# Tools")
-similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs(["Find Similar Players", "Player vs Player Predictor", "Game Prediction"])
+similar_players_tab, player_vs_player_tab, game_prediction_tab = st.tabs([
+    "Find Similar Players", "Player vs Player Predictor", "Match-up Predictor"
+])
 
 def create_player_pairs() -> list:
     pairs = list()
@@ -204,3 +206,6 @@ with player_vs_player_tab:
                     <h1 style="color: #ff4b4b;">Player 1</h1>
                 </div>
             """, unsafe_allow_html=True)
+
+with game_prediction_tab:
+    pass
