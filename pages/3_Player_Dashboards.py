@@ -57,7 +57,7 @@ if selected_player:
 
             # Basic Info
             st.markdown("<h3>Basic Info</h3>", unsafe_allow_html=True)
-            a1, a2, a3 = st.columns([1, 2, 2])
+            a1, a2, a3 = st.columns([1, 2, 1])
             a1.metric("Age", current_season_metrics.get('Age'), border=True)
             a2.metric("Position", current_season_metrics.get('Position'), border=True)
             a3.metric("Team", current_season_metrics.get('Team'), border=True)
