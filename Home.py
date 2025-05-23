@@ -1,6 +1,12 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(page_title="Home", layout="wide")
+
+team_stats_df = pd.read_csv("./data/Cleaned_NBA_Per_Game_Stats_2015_2024.csv")
+regular_df = pd.read_csv("./data/Cleaned_NBA_Regular_Season_Games_2015_2024.csv")
+playoff_df = pd.read_csv("./data/Cleaned_NBA_Playoff_Games_2015_2024.csv")
+all_games_df = pd.read_csv("./data/Cleaned_NBA_All_Games_2015_2024.csv")
 
 st.header("Exploring NBA Statistics")
 
@@ -55,10 +61,52 @@ st.markdown("""
 st.header("Dataset Overview")
 st.write("""
     The data we are working with consists of 3 separate datasets, all originating from the NBA. 
+    The first dataset contains player data from 1425 players, every row containing a player, season, and average stats for that season.\n
 """)
+st.divider()
+st.dataframe(team_stats_df)
+
+st.write("The seconds dataset contains regular games from every team and every season, along with the same metrics as the player dataset.")
+st.divider()
+st.dataframe(regular_df)
+
+st.write("Our last dataset is the exact same as the previous, except it contains playoff games.")
+st.divider()
+st.dataframe(playoff_df)
+
+st.write("These last two datasets were combined into a larger games dataset containing every game for easier use.")
 
 # Wrangling Methodology
 st.header("Wrangling Methodology")
+st.write("""
+    The dataset was compiled from NBA player statistics across multiple seasons using the NBA API. Due to the 
+    robustness of the NBA datasets and the abundance of available documentation, the raw data required minimal 
+    preprocessing. However, several foundational cleaning steps were performed using pandas to ensure consistency and reliability for analysis.
+""")
+
+st.subheader("Date Formatting")
+st.write("Game dates were initially provided as strings. These were converted into proper datetime format to facilitate time-based filtering and analysis.")
+st.code("regular_games['GAME_DATE'] = pd.to_datetime(regular_games['GAME_DATE'], errors='coerce')")
+
+st.subheader("Header Row Removal")
+st.write("Some datasets included repeated headers within the data. These were removed to prevent type mismatches and ensure clean numeric operations.")
+st.code("team_stats = team_stats[team_stats['Player'] != 'Player']")
+
+st.subheader("Data Type Correction")
+st.write("Numeric values such as points, assists, and rebounds were sometimes parsed as strings. We ensured that all columns containing numeric-like values were properly cast:")
+st.code("""
+    for col in team_stats.columns:
+        team_stats[col] = pd.to_numeric(team_stats[col], errors='ignore')
+""")
+
+st.subheader("Feature Engineering")
+st.write("""
+    Additional features were engineered to support downstream analysis, these included binary columns, team rank, z-scores, Euclidean distances from average metrics, rolling averages, and more.
+    Feature engineering plays a crucial role in developing machine learning models. By generating new features from existing data, you can uncover hidden patterns, trends, or relationships between variables
+    that may not have been immediately apparent beforehand. These new columns can help the models distinguish between classes, predict outcomes, and generalize unseen data more accurately.
+    Ultimately, thoughtful engineering, often leads to simpler and more accurate machine learning models, making it a key step in the process.
+""")
+
 
 # Results & Evaluation
 st.header("Results & Evaluation")
