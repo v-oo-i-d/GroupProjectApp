@@ -271,8 +271,7 @@ for i, (val, color, team) in enumerate(zip(values, colors, teams)):
         text=team,
         textposition="inside",
         marker=dict(color=color),
-        name=f"Segment {i+1}",
-        hoverinfo='x+name'
+        hoverinfo=None
     ))
     cumulative += val
 
@@ -284,7 +283,7 @@ fig.update_layout(
     xaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title=''),
     yaxis=dict(showticklabels=False, showgrid=False, zeroline=False, title='')
 )
-st.plotly_chart(fig, key="solid_color_bar")
+st.plotly_chart(fig)
 
 st.write("""
     Austin Rivers has been labelled as an underperforming player this season, owing to his below-average shooting efficiency, with a field goal percentage of only 42.0%. 
@@ -315,7 +314,7 @@ st.dataframe({
 st.write("Adding him to the Miami Heat")
 st.code("""
     # Add to roster
-    miami_heat_stats = pd.concat([compute_team_averages(average_team_stats.iloc[indices[0][0]].name), austin_river_data]).loc[:, 'FG%':'GAME_COUNT'']
+    miami_heat_stats = pd.concat([compute_team_averages(average_team_stats.iloc[indices[0][0]].name), austin_river_data]).loc[:, 'FG%':'GAME_COUNT']
     
     # Re-calculate z-score and performance
     miami_heat_stats["DISTANCE_FROM_AVG"] = calculate_distance_from_avg(miami_heat_stats)
