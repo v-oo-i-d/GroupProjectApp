@@ -173,16 +173,6 @@ st.code("""
     ]
     houston_rockets_stats.iloc[:-1, [-3]]
 """)
-st.dataframe(pd.DataFrame(data={
-    'DISTANCE_FROM_AVG': [
-        20.078258, 15.926157, 13.211909, 11.794021, 10.883128,
-        1.041478, 0.878695, 0.772126, 0.711175
-    ]
-}, index=[
-    "James Harden", "Russell Westbrook", "John Wall", "Jalen Green", "Chris Paul",
-    "Josh Smith", "KJ Martin", "Frank Kaminsky", "Austin Rivers"
-]))
-st.write("The higher the distance, the better the player.")
 
 st.markdown("##### Identify underperforming players using Z-score and label appropriately")
 st.write("""
@@ -295,18 +285,8 @@ st.write("""
 """)
 
 st.code("austin_rivers_data = houston_rockets_stats.iloc[[-2]].copy()")
-st.dataframe({
+st.dataframe(data={
     'Player': ['Austin Rivers'],
-    'FG%': [0.420333],
-    '3P%': [0.341],
-    'FT%': [0.667833],
-    'AST': [2.15],
-    'STL': [0.725],
-    'BLK': [0.158333],
-    'TOV': [0.983333],
-    'PF': [2.091667],
-    'PTS': [8.458333],
-    'GAME_COUNT': [12.0],
     'DISTANCE_FROM_AVG': [0.711175],
     'Z_SCORE': [-1.070574],
     'PERFORMANCE': ['Underperforming']
@@ -332,16 +312,6 @@ st.code("""
 """)
 st.dataframe(data = {
     'Player': ['Austin Rivers'],
-    'FG%': [0.420333],
-    '3P%': [0.341],
-    'FT%': [0.667833],
-    'AST': [2.15],
-    'STL': [0.725],
-    'BLK': [0.158333],
-    'TOV': [0.983333],
-    'PF': [2.091667],
-    'PTS': [8.458333],
-    'GAME_COUNT': [12.0],
     'DISTANCE_FROM_AVG': [1.020882],
     'Z_SCORE': [-0.958928],
     'PERFORMANCE': ['Average']
@@ -384,39 +354,9 @@ st.code("""
         train_model(clf)
 """)
 st.badge("KNN Accuracy: 71.0%", color="red")
-st.write("""
-    K Nearest Neighbors (KNN) is a basic classification algorithm which makes predictions based on the similarity between data points. 
-    KNN represents each game as a vector in multidimensional space; looking for the K most similar games using euclidean distance by default. 
-    The algorithm then looks at what happened in the K most similar games and predicts the most frequent outcome as the outcome for the new game. 
-    KNN is an all round safe bet when it comes to classifying numerical data, but may not be the best suited in every case. 
-    For this example, we achieved an accuracy of 71% which is decent and means its classifying correctly most of the time.
-""")
 st.badge("Random Forest Accuracy: 80.3%", color="green")
-st.write("""
-    Random Forest is a powerful classifier that constructs several decision trees on several random subsets of the data and the features. 
-    To predict, it takes all of the sub-trees and forms a prediction on the grounds of majority voting to provide a more precise and stable prediction than a single decision tree. 
-    Random Forest is designed to reduce overfitting and improve generalization by combining the predictions of multiple decision trees trained on different subsets of the data. 
-    This has proved successful, as we have a much better accuracy of 80.3%, meaning it's classifying correctly four fifths of the time.
-""")
 st.badge("SVC: 75.2%", color="orange")
-st.write("""
-    Support Vector Classification (SVC) is an algorithm for machine learning which tries to separate the data into classes by learning the best boundary between them. 
-    SVC tries to find not just the line that separates the classes, but the line as far as it can from the closest points in each set. 
-    These are called support vectors, and are the defining points which make the line of separation. If the data cannot be divided neatly using a line, SVC can apply what's called a kernel function to transform the data so it can be divided. 
-    Once it's trained, the model uses the boundary to determine into what grouping a new item of data fits. With an accuracy of 75.2% it's proving to be a decent choice.
-""")
 st.badge("Gradient Boosting Accuracy: 80.2%", color="orange")
-st.write("""
-    Gradient Boosting Classification is another ensemble ML process where it builds an efficient prediction model by aggregating multiple weak decision trees in an iterative process. 
-    Each iteration entails trying to minimize the previous iterations' residual errors as much as possible. This process is performed by training the new learner on the errors of previous decision trees. 
-    Gradient boosting works well for many classification problems and can be adjusted to perform even better by choosing different ways to measure errors (loss functions) and by using techniques that help prevent the model from becoming too complicated. 
-    This resulted in an accuracy of 80.2%.
-    
-    In summary, each of the classifiers performed as anticipated and in line with the type and quality of the dataset. From the observed performance, each of the models was suited for the task and was capable of dealing with the information in a satisfactory manner. 
-    Differences in performance did occur, but were primarily a result of the nature of each of the classifiers and how it operates on the patterns in the information.
-""")
-st.divider()
-
 
 
 

@@ -109,10 +109,39 @@ st.write("""
 
 
 # Results & Evaluation
-st.header("Results & Evaluation")
+# st.header("Results & Evaluation")
 
 # Discussion
-st.header("Discussion")
+st.header("Discussion (add your own sections)")
+st.subheader("Classification")
+st.markdown("""
+    This section of the discussion serves to discuss the classification models used in the analyses section of this research.
+    It weighs the pros and cons and nature of each classification model and its u
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K Nearest Neighbors (KNN) is a basic classification algorithm which makes predictions based on the similarity between data points. 
+    KNN represents each game as a vector in multidimensional space; looking for the K most similar games using euclidean distance by default. 
+    The algorithm then looks at what happened in the K most similar games and predicts the most frequent outcome as the outcome for the new game. 
+    KNN is an all round safe bet when it comes to classifying numerical data, but may not be the best suited in every case. 
+    For this example, we achieved an accuracy of 71% which is decent and means its classifying correctly most of the time.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Random Forest is a powerful classifier that constructs several decision trees on several random subsets of the data and the features. 
+    To predict, it takes all of the sub-trees and forms a prediction on the grounds of majority voting to provide a more precise and stable prediction than a single decision tree. 
+    Random Forest is designed to reduce overfitting and improve generalization by combining the predictions of multiple decision trees trained on different subsets of the data. 
+    This has proved successful, as we have a much better accuracy of 80.3%, meaning it's classifying correctly four fifths of the time.
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Support Vector Classification (SVC) is an algorithm for machine learning which tries to separate the data into classes by learning the best boundary between them. 
+    SVC tries to find not just the line that separates the classes, but the line as far as it can from the closest points in each set. 
+    These are called support vectors, and are the defining points which make the line of separation. If the data cannot be divided neatly using a line, SVC can apply what's called a kernel function to transform the data so it can be divided. 
+    Once it's trained, the model uses the boundary to determine into what grouping a new item of data fits. With an accuracy of 75.2% it's proving to be a decent choice.
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gradient Boosting Classification is another ensemble ML process where it builds an efficient prediction model by aggregating multiple weak decision trees in an iterative process. 
+    Each iteration entails trying to minimize the previous iterations' residual errors as much as possible. This process is performed by training the new learner on the errors of previous decision trees. 
+    Gradient boosting works well for many classification problems and can be adjusted to perform even better by choosing different ways to measure errors (loss functions) and by using techniques that help prevent the model from becoming too complicated. 
+    This resulted in an accuracy of 80.2%.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To summarise, each of the classifiers performed as anticipated and in line with the type and quality of the dataset. From the observed performance, each of the models was suited for the task and was capable of dealing with the information in a satisfactory manner. 
+    Differences in performance did occur, but were primarily a result of the nature of each of the classifiers and how it operates on the patterns in the information.
+""")
 
 # Conclusion
-st.header("Conclusion")
+st.header("Conclusion?")

@@ -195,15 +195,15 @@ with player_vs_player_tab:
         if prediction == 1:
             st.markdown("""
                 <div style="text-align: center; background-color: #111; border-radius: 10px; padding: 20px; margin-top: 30px; border: 2px solid #ff4b4b;">
-                    <h2 style="color: white;">🏆 Predicted Winner:</h2>
+                    <h2 style="color: white;">Predicted Winner:</h2>
                     <h1 style="color: #ff4b4b;">Player 1</h1>
                 </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown("""
                 <div style="text-align: center; background-color: #111; border-radius: 10px; padding: 20px; margin-top: 30px; border: 2px solid #ff4b4b;">
-                    <h2 style="color: white;">🏆 Predicted Winner:</h2>
-                    <h1 style="color: #ff4b4b;">Player 1</h1>
+                    <h2 style="color: white;">Predicted Winner:</h2>
+                    <h1 style="color: #ff4b4b;">Player 2</h1>
                 </div>
             """, unsafe_allow_html=True)
 
