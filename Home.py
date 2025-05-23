@@ -112,7 +112,36 @@ st.write("""
 # st.header("Results & Evaluation")
 
 # Discussion
-st.header("Discussion (add your own sections)")
+st.header("Results & Discussion (add your own sections)")
+st.subheader("Regression")
+st.markdown("""
+    To evaluate the performance of the Random Forest Regression model for predicting team points based on in-game statistics, three key metrics were used: Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R2 Score.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RMSE: 8.57 The RMSE value gives an idea of how much, on average, the model’s predictions deviate from the actual points scored, with more weight given to larger errors due to the squaring of residuals. 
+    An RMSE of 8.57 is reasonably low considering that NBA teams usually score between 80 to 130 points per game, suggesting that the model makes relatively accurate predictions with acceptable variability.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MAE: 6.81 MAE represents the average absolute difference between predicted and actual values. Unlike RMSE, it treats all errors equally. An MAE of 6.81 means the model’s predictions are typically within ~7 points of the actual score. 
+    This level of error is modest and confirms that the model provides useful estimates without frequent large deviations.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R2 Score: 0.5654 The R2 score indicates that approximately 56.5% of the variance in team points is explained by the features used in the model. 
+    While this isn’t extremely high, it's a solid result considering that factors like team strategy, player form, pace, and opponent defense (not all of which are captured in the dataset) also influence scoring. 
+    This R2 suggests the model captures a significant portion of the underlying patterns, especially from features like FGA, FTA, AST, and OREB.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To better understand which features had the most influence on the model’s predictions, a feature importance plot was generated from the trained Random Forest Regressor. 
+    This visualization allowed for a clear identification of which in-game statistics had the greatest impact on predicting a team’s points scored.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;By examining the relative weight of each feature, it became easier to analyze the predictive power of different variables and make informed decisions about feature selection. 
+    This insight was especially useful for experimenting with model performance by selectively including or excluding certain features. Overall, the feature importance plot served as a valuable tool for both interpretation and model improvement.
+    Observing the plot, it's evident that assists (AST) stand out as the most significant predictor of team points, with a substantial margin (~0.25) over the next most important feature, free throw attempts (FTA).
+    A high number of assists typically indicates strong ball movement, unselfish play, and well-executed offensive strategies. Teams that generate more assists are often creating more shot opportunities, which directly contributes to a higher point total. 
+    Assists are not only a reflection of playmaking ability but also a show of successful scoring.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Other features like FTA, field goal attempts (FGA), field goal 3 point attempts (FG3A), and personal fouls (PF) also hold importance but tend to have more indirect relationships with point scoring. 
+    As these features still often indicate stronger teams. The importance of ASTs and the other features referenced above highlight how team efficiency, offensive execution, and ability to draw fouls play a major role in point production, making them key metrics in predicting scoring outcomes.
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+""")
+
 st.subheader("Classification")
 st.markdown("""
     This section of the discussion serves to discuss the classification models used in the analyses section of this research.

@@ -17,11 +17,11 @@ st.write("""
 """)
 st.divider()
 
-st.header("Regression")
-st.write("""
-    Kobe's section
-""")
-st.divider()
+# st.header("Regression")
+# st.write("""
+#     Kobe's section
+# """)
+# st.divider()
 
 
 st.header("Classification")
@@ -374,46 +374,46 @@ st.badge("Gradient Boosting Accuracy: 80.2%", color="orange")
 
 
 
-st.header("Time Series")
-st.write("""
-    A.J's section 
-""")
-st.divider()
+# st.header("Time Series")
+# st.write("""
+#     A.J's section
+# """)
+# st.divider()
+#
+#
+# st.header("Clustering")
+# st.write("""
+#     Amanda's section
+# """)
+# st.divider()
 
 
-st.header("Clustering")
-st.write("""
-    Amanda's section
-""")
-st.divider()
-
-
-with st.sidebar:
-    st.header("Contents")
-    # Table of contents
-    st.markdown("""
-        <style>
-            .toc a {
-                display: block;
-                text-decoration: none;
-                color: var(--text-color);
-                padding-left: 0px;
-                margin: 0.25em 0;
-                font-size: 0.95em;
-                transition: opacity 0.1s;
-            }
-            .toc a:hover {
-                opacity: 0.5;
-            }
-            .toc a.one {
-                padding-left: 20px;
-            }
-        </style>
-        
-        <div class="toc">
-            <a href="#regression">Regression</a>
-            <a href="#classification">Classification</a>
-            <a href="#time-series">Time Series</a>
-            <a href="#clustering">Clustering</a>
-        </div>
-        """, unsafe_allow_html=True)
+# with st.sidebar:
+#     st.header("Contents")
+#     # Table of contents
+#     st.markdown("""
+#         <style>
+#             .toc a {
+#                 display: block;
+#                 text-decoration: none;
+#                 color: var(--text-color);
+#                 padding-left: 0px;
+#                 margin: 0.25em 0;
+#                 font-size: 0.95em;
+#                 transition: opacity 0.1s;
+#             }
+#             .toc a:hover {
+#                 opacity: 0.5;
+#             }
+#             .toc a.one {
+#                 padding-left: 20px;
+#             }
+#         </style>
+#
+#         <div class="toc">
+#             <a href="#regression">Regression</a>
+#             <a href="#classification">Classification</a>
+#             <a href="#time-series">Time Series</a>
+#             <a href="#clustering">Clustering</a>
+#         </div>
+#         """, unsafe_allow_html=True)
