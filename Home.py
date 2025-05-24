@@ -113,3 +113,11 @@ st.markdown("*Results and discussions can be found under in the Analyses tab*")
 
 # Conclusion
 st.header("Conclusion?")
+st.markdown("""
+    The successful wrapping up of this data wrangling project is a significant step towards transforming raw intricate data into a structured and analysis-ready state. 
+    Throughout the process, we used a wide range of approaches, including data cleaning, normalisation, feature engineering, integrating different datasets, and data type conversion.
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From a technical aspect, the project required the use of powerful resources like Python's Pandas and different data visualisation methods. 
+    The original datasets, which comprised thousands of items, was carefully revised and combined, producing a single robust dataset.
+
+""")
