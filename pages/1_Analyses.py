@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 st.set_page_config(page_title="Analyses", page_icon="🔎", layout="wide")
 
@@ -450,8 +452,97 @@ There were several technical decisions I made during this process:
 
 If I had more time, I would have liked to tried more advanced models for more accurate, team-specific forecasting, and experiment with different seasonal periods based on autocorrelation plots.
 """)
-st.divider()
 
+@st.cache_data
+def load_data(path="./data/Cleaned_NBA_All_Games_2015_2024.csv"):
+    df = pd.read_csv(path)
+    df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
+    return df
+
+regular_games = load_data()
+
+# Aggregate seasonal PPG by team
+team_season_stats = (
+    regular_games
+    .groupby([pd.Grouper(key="GAME_DATE", freq="Y"), "TEAM_NAME"])["PTS"]
+    .mean()
+    .reset_index()
+    .rename(columns={"GAME_DATE": "SEASON", "PTS": "AVG_PTS"})
+)
+
+# Time Series Forecast — select a team to see it in action
+st.header("Time Series Forecast")
+teams = sorted(team_season_stats["TEAM_NAME"].unique())
+selected_team = st.selectbox("Select Team:", [""] + teams)
+
+if selected_team:
+    # Filter down to the chosen team
+    df = team_season_stats.query("TEAM_NAME == @selected_team").copy()
+    df.set_index("SEASON", inplace=True)
+    df.index = pd.to_datetime(df.index)
+
+    # Compute a 3-year rolling average and year-over-year change
+    df["RollingAvg"] = df["AVG_PTS"].rolling(window=3, min_periods=1).mean()
+    df["ChangeYOY"] = df["AVG_PTS"].diff()
+
+    # Decompose the PPG series into trend, seasonal and residual components
+    ts = df["AVG_PTS"].copy()
+    ts.index = pd.date_range(start=df.index.min(), periods=len(ts), freq="Y")
+    decomp = seasonal_decompose(ts, model="additive", period=3)
+
+    # Build a simple next-season forecast
+    next_year = df.index.year.max() + 1
+    forecast = (
+        df["RollingAvg"].iloc[-1]
+        + decomp.seasonal.iloc[-3]
+        + decomp.resid.mean(skipna=True)
+    )
+
+    # 1) Average Points Per Game
+    st.subheader("Average Points Per Game")
+    st.markdown("How a team's average PPG evolves each season.")
+    fig1, ax1 = plt.subplots(figsize=(10, 4))
+    ax1.plot(df.index.year, df["AVG_PTS"], marker="o")
+    ax1.set_title("Average PPG by Season")
+    ax1.set_xlabel("Season")
+    ax1.set_ylabel("Avg PPG")
+    ax1.grid(True)
+    st.pyplot(fig1)
+
+    # 2) Year-over-Year Change
+    st.subheader("Year-over-Year Change")
+    st.markdown("Season-to-season delta in a team's average PPG.")
+    fig2, ax2 = plt.subplots(figsize=(10, 4))
+    ax2.bar(df.index.year, df["ChangeYOY"], color="gray")
+    ax2.set_title("Year-over-Year Change in PPG")
+    ax2.set_xlabel("Season")
+    ax2.set_ylabel("Δ Avg PPG")
+    ax2.grid(True)
+    st.pyplot(fig2)
+
+    # 3) Time Series Decomposition
+    st.subheader("Time Series Decomposition")
+    st.markdown("Trend, seasonal and residual components of the PPG series.")
+    fig3 = decomp.plot()
+    fig3.set_size_inches(10, 8)
+    fig3.suptitle("Decomposition of Average PPG", y=1.02)
+    st.pyplot(fig3)
+
+    # 4) Forecast for Next Season
+    st.subheader("Forecast for Next Season")
+    st.markdown("Projection combining 3-yr trend, seasonal effect and residual.")
+    fig4, ax4 = plt.subplots(figsize=(10, 4))
+    ax4.plot(df.index.year, df["RollingAvg"], marker="x", linestyle="--", label="3-Yr Rolling Avg")
+    ax4.scatter([next_year], [forecast], color="red", s=100, label="Forecast")
+    ax4.set_title("Rolling Average & Next Season Forecast")
+    ax4.set_xlabel("Season")
+    ax4.set_ylabel("Avg PPG")
+    ax4.legend()
+    ax4.grid(True)
+    st.pyplot(fig4)
+
+    st.success(f"Forecasted Avg PPG for {selected_team}: {forecast:.2f}")
+st.divider()
 
 st.header("Clustering")
 st.write("""
