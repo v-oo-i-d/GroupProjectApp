@@ -357,30 +357,135 @@ st.badge("KNN Accuracy: 71.0%", color="red")
 st.badge("Random Forest Accuracy: 80.3%", color="green")
 st.badge("SVC: 75.2%", color="orange")
 st.badge("Gradient Boosting Accuracy: 80.2%", color="orange")
+st.markdown("""
+    K Nearest Neighbors (KNN) is a basic classification algorithm which makes predictions based on the similarity between data points. 
+    KNN represents each game as a vector in multidimensional space; looking for the K most similar games using euclidean distance by default. 
+    The algorithm then looks at what happened in the K most similar games and predicts the most frequent outcome as the outcome for the new game. 
+    KNN is an all round safe bet when it comes to classifying numerical data, but may not be the best suited in every case. 
+    For this example, we achieved an accuracy of 71% which is decent and means its classifying correctly most of the time.
+    
+    Random Forest is a powerful classifier that constructs several decision trees on several random subsets of the data and the features. 
+    To predict, it takes all of the sub-trees and forms a prediction on the grounds of majority voting to provide a more precise and stable prediction than a single decision tree. 
+    Random Forest is designed to reduce overfitting and improve generalization by combining the predictions of multiple decision trees trained on different subsets of the data. 
+    This has proved successful, as we have a much better accuracy of 80.3%, meaning it's classifying correctly four fifths of the time.
+
+    Support Vector Classification (SVC) is an algorithm for machine learning which tries to separate the data into classes by learning the best boundary between them. 
+    SVC tries to find not just the line that separates the classes, but the line as far as it can from the closest points in each set. 
+    These are called support vectors, and are the defining points which make the line of separation. If the data cannot be divided neatly using a line, SVC can apply what's called a kernel function to transform the data so it can be divided. 
+    Once it's trained, the model uses the boundary to determine into what grouping a new item of data fits. With an accuracy of 75.2% it's proving to be a decent choice.
+
+    Gradient Boosting Classification is another ensemble ML process where it builds an efficient prediction model by aggregating multiple weak decision trees in an iterative process. 
+    Each iteration entails trying to minimize the previous iterations' residual errors as much as possible. This process is performed by training the new learner on the errors of previous decision trees. 
+    Gradient boosting works well for many classification problems and can be adjusted to perform even better by choosing different ways to measure errors (loss functions) and by using techniques that help prevent the model from becoming too complicated. 
+    This resulted in an accuracy of 80.2%.
+    
+    To summarise, each of the classifiers performed as anticipated and in line with the type and quality of the dataset. From the observed performance, each of the models was suited for the task and was capable of dealing with the information in a satisfactory manner. 
+    Differences in performance did occur, but were primarily a result of the nature of each of the classifiers and how it operates on the patterns in the information.
+
+""")
 
 
+st.header("Time Series")
+st.write("""
+For this section of the project, I focused on time series analysis. I wanted to understand how teams' average points per game (PPG) changed over time, and to forecast where a team might be headed based on its historical performance.
+
+I chose this approach because it allowed me to look beyond isolated game stats and focus on long-term patterns. Whilst I wanted to research more into advanced forecasting models like ARIMA, I opted for a simpler and more explainable method given our time constraints and other aspects of this project.
+""")
+st.subheader("Step 1: Preparing the Time Series Data")
+st.write("""
+I began by grouping regular season game data by `TEAM_NAME` and the season end date. I opted to only use regular season games as I knew all teams would play the same amount of games through a regular season and I did not want playoff fixtures to skew the results, so with that being said this analysis is only applicable for regular season games. For each team, I calculated the average points per game per season. This gave a clean summary of team performance over time.
+
+Here’s the code I used to generate the time series:
+""")
+st.code("""
+team_season_stats = (
+    regular_games.groupby([pd.Grouper(key="GAME_DATE", freq="Y"), "TEAM_NAME"])["PTS"]
+    .mean()
+    .reset_index()
+    .rename(columns={"GAME_DATE": "SEASON", "PTS": "AVG_PTS"})
+)
+""")
+st.subheader("Step 2: Visualisations")
+st.write("""
+I created four visualisations for each team, ordered in a way that makes logical sense. We started with raw performance, then showing change, breaking down patterns, and finally estimating a forecast for next season.
+""")
+st.markdown("**1. Average Points Per Game (APPG)**")
+st.write("""
+This line graph shows how a team's average points per game has changed across seasons. It gives a good sense of whether a team has improved, declined, or stayed relatively consistent over time. 
+""")
+st.markdown("**2. Change in APPG (Year-over-Year)**")
+st.write("""
+This bar chart displays how much the team’s scoring changed from one season to the next. It helps identify sudden jumps or drops, which often relate to roster changes, coaching adjustments, or other external factors.
+""")
+st.markdown("**3. Time Series Decomposition**")
+st.write("""
+I used the `seasonal_decompose` function from the `statsmodels` library to break down the scoring time series into:
+- **Trend** – the overall direction of scoring over time
+- **Seasonal** – repeating patterns, in this case roughly every three years
+- **Residual** – random or unexplained variation
+
+This breakdown made it easier to identify whether a team's performance was steadily improving, cycling seasonally, or fluctuating without clear structure.
+
+Here’s how I implemented it:
+""")
+st.code("""
+ts = data["AVG_PTS"].copy()
+ts.index = pd.date_range(start=data.index.min(), periods=len(ts), freq='Y')
+decomp = seasonal_decompose(ts, model="additive", period=3)
+""")
+st.write("""
+The decomposition gave deeper insight into each team's scoring pattern and helped prepare the forecast.
+""")
+st.markdown("**4. Rolling Average and Forecast**")
+st.write("""
+To estimate the next season’s average points, I applied a 3-year rolling average to smooth out the data and used the decomposition components to build a simple forecast. 3 year seemed appropriate for the model as we were initially dealing with a 9 year period and most contracts in the sporting era can vary between 1-5 years in length.
+
+Because we didn’t have time to build a full model, I used a basic method where the forecast equals:
+- The most recent rolling average
+- Plus the latest seasonal effect
+- Plus the mean of the residuals
+
+Here’s the code for the calculation:
+""")
+st.code("""
+forecast_trend = data["RollingAvg"].iloc[-1]
+forecast_season = decomp.seasonal.iloc[-3]
+forecast_resid = decomp.resid.mean(skipna=True)
+forecast_val = forecast_trend + forecast_season + forecast_resid
+""")
+st.write("""
+Although from my readings this model is not as robust as ARIMA or exponential smoothing, this method still gave a reasonable estimate and worked well for our projects scope.
+""")
+st.subheader("Step 3: Connecting Forecasts to Match Predictions")
+st.write("""
+Once I had forecasted average points for each team, I used this to simulate head-to-head matchups. The logic was simple: if Team A’s forecasted points were higher than Team B’s, Team A would be predicted to win.
+
+To make this interactive, I built a dropdown system where users can select two teams to compare. The app then calculates the forecast for both and returns the expected winner.
+
+Here’s a simplified version of the logic I used:
+""")
+st.code("""
+score1 = round(forecast_avg_pts(team1))
+score2 = round(forecast_avg_pts(team2))
+
+winner = team1 if score1 > score2 else team2 if score2 > score1 else "Tie"
+""")
+st.write("""
+This added a practical application to the forecasting work that turned raw time series data into a simple, interpretable decision tool.
+""")
+st.subheader("Technical Considerations")
+st.write("""
+There were several technical decisions I made during this process:
+
+- I used `pd.date_range()` with `freq='Y'` to generate evenly spaced annual time points, aligning with the assumption of one observation per season.
+- I selected a seasonal period of 3 in `seasonal_decompose` based on exploratory plotting, many teams showed multi-year performance cycles.
+- I applied the same rolling average and decomposition-based forecast method to all teams for consistency, knowing that this wouldn’t be perfect for every case.
+
+If I had more time, I would have liked to tried more advanced models for more accurate, team-specific forecasting, and experiment with different seasonal periods based on autocorrelation plots.
+""")
+st.divider()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# st.header("Time Series")
-# st.write("""
-#     A.J's section
-# """)
-# st.divider()
-#
-#
 # st.header("Clustering")
 # st.write("""
 #     Amanda's section
@@ -388,32 +493,32 @@ st.badge("Gradient Boosting Accuracy: 80.2%", color="orange")
 # st.divider()
 
 
-# with st.sidebar:
-#     st.header("Contents")
-#     # Table of contents
-#     st.markdown("""
-#         <style>
-#             .toc a {
-#                 display: block;
-#                 text-decoration: none;
-#                 color: var(--text-color);
-#                 padding-left: 0px;
-#                 margin: 0.25em 0;
-#                 font-size: 0.95em;
-#                 transition: opacity 0.1s;
-#             }
-#             .toc a:hover {
-#                 opacity: 0.5;
-#             }
-#             .toc a.one {
-#                 padding-left: 20px;
-#             }
-#         </style>
-#
-#         <div class="toc">
-#             <a href="#regression">Regression</a>
-#             <a href="#classification">Classification</a>
-#             <a href="#time-series">Time Series</a>
-#             <a href="#clustering">Clustering</a>
-#         </div>
-#         """, unsafe_allow_html=True)
+with st.sidebar:
+    st.header("Contents")
+    # Table of contents
+    st.markdown("""
+        <style>
+            .toc a {
+                display: block;
+                text-decoration: none;
+                color: var(--text-color);
+                padding-left: 0px;
+                margin: 0.25em 0;
+                font-size: 0.95em;
+                transition: opacity 0.1s;
+            }
+            .toc a:hover {
+                opacity: 0.5;
+            }
+            .toc a.one {
+                padding-left: 20px;
+            }
+        </style>
+
+        <div class="toc">
+            <a href="#regression">Regression</a>
+            <a href="#classification">Classification</a>
+            <a href="#time-series">Time Series</a>
+            <a href="#clustering">Clustering</a>
+        </div>
+        """, unsafe_allow_html=True)
