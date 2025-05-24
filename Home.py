@@ -51,7 +51,8 @@ st.markdown("""
     Working with real world sports data, especially from an immensely popular sport like basketball, is either a hit or miss when it comes to extracting data. 
     Across seasons, data can vary in format, contain missing or inconsistent values, and often includes an overwhelming number of features and player records. 
     These issues can hinder the ability to draw insights or use the data effectively for deeper analysis or visualization.
-    The primary goal of this project was to take raw NBA performance data and turn it into something clean, structured, and ready for analysis. 
+    
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The primary goal of this project was to take raw NBA performance data and turn it into something clean, structured, and ready for analysis. 
     This involved, honestly, very minimal inconsistency resolving and cleaning. The work here differs in that it focuses solely on actual data wrangling stages particular to sports analytics. 
     This project walks through all of the steps, from acquiring the data, cleaning it, potential feature engineering, and eventually visualization, 
     to demonstrate how the demands data preparation may lead to insightful findings and enable intricate modelling in the future.
@@ -112,12 +113,19 @@ st.header("Results & Discussion")
 st.markdown("*Results and discussions can be found under in the Analyses tab*")
 
 # Conclusion
-st.header("Conclusion?")
+st.header("Conclusion")
 st.markdown("""
     The successful wrapping up of this data wrangling project is a significant step towards transforming raw intricate data into a structured and analysis-ready state. 
-    Throughout the process, we used a wide range of approaches, including data cleaning, normalisation, feature engineering, integrating different datasets, and data type conversion.
+    Throughout the process, we used a wide range of approaches, including data cleaning, feature engineering, and data type conversion.
 
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From a technical aspect, the project required the use of powerful resources like Python's Pandas and different data visualisation methods. 
-    The original datasets, which comprised thousands of items, was carefully revised and combined, producing a single robust dataset.
+    Two of the original datasets, which comprised of thousands of items, were carefully revised and combined, producing a single robust games dataset.
 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A key achievement of this project was the creation of new, meaningful features that captured underlying patterns in the data and significantly enhanced the performance of the machine learning models used. 
+    By carefully engineering new variables, we not only improved model accuracy but also enabled deeper insights and more nuanced interpretations.
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Aside from the technological successes, this research highlights the need of careful data preparation. High quality data is the core of every data-driven decision-making process, 
+    and this project hopefully demonstrates how thorough data wrangling may reveal hidden patterns and guarantee that analytical models are constructed on solid foundations.
+
+    In conclusion, several data wrangling techniques were used to reach a solid end result. It provides a solid framework for predictive modelling and strategic planning.
 """)
