@@ -4,9 +4,9 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
 import seaborn as sns
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+# from sklearn.ensemble import RandomForestRegressor
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 st.set_page_config(page_title="Analyses", page_icon="🔎", layout="wide")
 
@@ -356,6 +356,8 @@ st.write("""
     To summarise, each of the classifiers performed as anticipated and in line with the type and quality of the dataset. From the observed performance, each of the models was suited for the task and was capable of dealing with the information in a satisfactory manner. 
     Differences in performance did occur, but were primarily a result of the nature of each of the classifiers and how it operates on the patterns in the information.
 """)
+
+st.divider()
 st.divider()
 
 st.header("Time Series")
@@ -546,12 +548,118 @@ if selected_team:
     st.pyplot(fig4)
 
     st.success(f"Forecasted Avg PPG for {selected_team}: {forecast:.2f}")
+
+st.divider()
 st.divider()
 
 st.header("Clustering")
 st.write("""
-    Amanda's section
+This section focuses on completing unsupervised classification by clustering with K-Means. With this we are able to see if we can create clusters of players by position that perform similarly and have similar average game statistics. In this we way, we can also extend this to cluster NBA teams based on their play style/performance. For clustering with k-Means we want high within group similarity but low between group similarity. Sometimes there are clear groupings, sometimes there are no clear groupings and often we find something in between.
 """)
+
+st.subheader("Can we cluster players that play a particular position by their average play style/performance?")
+
+st.markdown("""
+    **Steps Included:**
+    1. Feature Selection based on Position.
+    2. Checking for missing values as Clustering with k-Means cannot be completed with NA values.
+    3. Scale the data using MinMax. Variables on different scales are not suitable for Clustering with k-Means. 
+    4. Perform clustering with k-Means using scikit-learn, setting the number of starting points and the method to choose these starting points via n_init and init.
+    5. Identify the best value of k via Silhouette Score, Inertia, Davies–Bouldin Index Average and Calinski–Harabasz Index calculations and plots.
+    6. Identifying features of the clusters to try and determine what these clusters represent through description tables and pairs plots of clusters.
+    7. Visualise the data through UMAP projection to see the groupings of the multi-dimensional clusters and whether they are distinct.
+""")
+
+st.subheader("Player Cluster Viewer by Position")
+
+position = st.selectbox("Select a Position", ["Shooting Guard", "Power Forward", "Point Guard", "Center", "Small Forward"])
+
+file_map = {
+    "Shooting Guard": "./data/playerinfo_df_SG.csv",
+    "Power Forward": "./data/playerinfo_df_PF.csv",
+    "Point Guard": "./data/playerinfo_df_PG.csv",
+    "Center": "./data/playerinfo_df_C.csv",
+    "Small Forward": "./data/playerinfo_df_SF.csv"
+}
+
+file_path = file_map[position]
+
+try:
+    df = pd.read_csv(file_path)
+
+    player_names = df["Player"].unique()
+    selected_player = st.selectbox("Select a Player", player_names)
+
+
+    player_info = df[df["Player"] == selected_player].iloc[0,1:]
+    cluster_id = player_info['Cluster']
+    cluster_mates = df[(df['Cluster'] == cluster_id) & (df["Player"] != selected_player)]
+    cluster_info = df[(df['Cluster'] == cluster_id)]
+
+    st.subheader(f"Cluster {cluster_id}")
+    st.subheader(f"Overview of Cluster {cluster_id}")
+    st.write(cluster_info.iloc[:,1:-1].describe()[1:])
+
+    st.subheader(f"Pairs Plot for Position {position}")
+    pair_grid = sns.pairplot(df[df.columns[1:]], diag_kind="kde", hue="Cluster")
+    st.pyplot(pair_grid.fig)
+
+    st.subheader("Selected Player Information")
+    st.write(player_info.to_frame().T)
+
+    st.subheader(f"Other Players in Cluster {cluster_id}")
+    st.dataframe(cluster_mates.iloc[:,1:-1])
+
+except FileNotFoundError:
+    st.error(f"The file for {position}s was not found. Make sure '{file_path}' exists.")
+
+
+st.subheader("Can we cluster teams by their average game statistics/play performance?")
+
+st.markdown("""
+    **Steps Included:**
+    1. Feature Selection based on Team Performance/Statistics.
+    2. Checking for missing values as Clustering with k-Means cannot be completed with NA values.
+    3. Scale the data using MinMax. Variables on different scales are not suitable for Clustering with k-Means. 
+    4. Perform clustering with k-Means using scikit-learn, setting the number of starting points and the method to choose these starting points via n_init and init.
+    5. Identify the best value of k via Silhouette Score, Inertia, Davies–Bouldin Index Average and Calinski–Harabasz Index calculations and plots.
+    6. Identifying features of the clusters to try and determine what these clusters represent through description tables and pairs plots of clusters.
+    7. Visualise the data through UMAP projection to see the groupings of the multi-dimensional clusters and whether they are distinct.
+""")
+
+st.subheader("Team Cluster Viewer")
+
+file_path2 = "./data/teaminfo_df_Grouped.csv"
+
+try:
+    df2 = pd.read_csv(file_path2)
+
+    team_names = df2["Team Name"].unique()
+    selected_team = st.selectbox("Select a Team", team_names)
+
+    team_info = df2[df2["Team Name"] == selected_team].iloc[0,1:]
+    cluster_id2 = team_info['Cluster']
+    cluster_mates2 = df2[(df2['Cluster'] == cluster_id2) & (df2["Team Name"] !=  selected_team)]
+    cluster_info2 = df2[(df2['Cluster'] == cluster_id2)]
+
+    st.subheader(f"Cluster {cluster_id2}")
+    st.subheader(f"Overview of Cluster {cluster_id2}")
+    st.write(cluster_info2.iloc[:,2:-1].describe()[1:])
+
+    st.subheader(f"Pairs Plot")
+    pair_grid2 = sns.pairplot(df2[df2.columns[2:]], diag_kind="kde", hue="Cluster")
+    st.pyplot(pair_grid2.fig)
+
+    st.subheader("Team Information")
+    st.write(team_info.to_frame().T)
+
+    st.subheader(f"Other Teams in Cluster {cluster_id2}")
+    st.dataframe(cluster_mates2.iloc[:,1:-1])
+
+except FileNotFoundError:
+    st.error(f"The file for {position}s was not found. Make sure '{file_path}' exists.")
+
+st.divider()
 st.divider()
 
 st.header("Regression")
@@ -704,8 +812,6 @@ The model shows that `FG3_PCT` (3-point field goal percentage) is by far the mos
 
 This matches NBA trends where strong 3-point shooting correlates strongly with winning and better rankings.
 """)
-
-st.markdown("---")
 
 st.write("Overall, both models demonstrate how game and season stats can be used to predict team scoring and ranking, highlighting key stats like assists and three-point shooting.")
 
