@@ -3,6 +3,10 @@ import pandas as pd
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
+import seaborn as sns
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 st.set_page_config(page_title="Analyses", page_icon="🔎", layout="wide")
 
@@ -552,7 +556,168 @@ st.divider()
 
 st.header("Regression")
 st.write("""
-    Kobe's section
+In this section, I aimed to predict how many points an NBA team would score in a game using common game statistics. 
+Rather than using actual scoring stats like `PTS`, `FGM`, or `3PM`, I selected features that could influence scoring 
+without directly giving it away — this helps avoid what's known as **data leakage**.
+""")
+
+st.subheader("Step 1: Preparing the Data")
+st.write("""
+I started by selecting 12 features that teams usually influence through gameplay:
+""")
+st.code("""
+features = [
+    'MIN', 'FGA', 'FG3A', 'FTA', 'OREB', 
+    'REB', 'DREB', 'AST', 'STL', 'BLK', 'TOV', 'PF'
+]
+X = regular_games[features]
+y = regular_games['PTS']
+""", language="python")
+st.write("""
+Here, `X` represents the predictor variables (our input stats), and `y` is the target variable — the points scored.
+""")
+
+st.subheader("Step 2: Splitting and Training the Model")
+st.write("""
+Next, I split the data into training and testing sets (80% training, 20% testing). 
+This helps the model learn from past data and evaluate performance on unseen games.
+""")
+st.code("""
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+reg = RandomForestRegressor(n_estimators=100, random_state=42)
+reg.fit(X_train, y_train)
+y_pred = reg.predict(X_test)
+""", language="python")
+st.write("""
+Random Forest is an ensemble model made up of many decision trees. Each tree gives a prediction, 
+and the forest averages them for more accurate and stable results.
+""")
+
+st.subheader("Step 3: Evaluating the Model")
+st.write("""
+To evaluate how well the model predicted team points, I used three common metrics:
+""")
+st.code("""
+rmse = mean_squared_error(y_test, y_pred, squared=False)
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+""", language="python")
+
+st.write("""
+- **RMSE (Root Mean Squared Error):** Measures average prediction error. Lower is better.
+- **MAE (Mean Absolute Error):** Average size of errors. Helps understand overall miss.
+- **R² Score:** Measures how much variation is explained by the model. 1.0 is perfect.
+""")
+
+st.subheader("Step 4: Interpreting the Model")
+st.write("""
+One big benefit of Random Forest is that it tells you how important each feature was in predicting team points.
+""")
+st.code("""
+importances = reg.feature_importances_
+""", language="python")
+
+st.write("""
+In my case, the model showed:
+- `AST` (assists) had the highest importance — logical, since assists lead directly to baskets.
+- `FTA`, `FGA`, and `OREB` followed closely — these represent opportunities to score.
+""")
+
+st.header("Predicting NBA Team Season Rank Based on Game Stats")
+
+st.write("""
+Next, I tried predicting a team's final rank in a given NBA season using Random Forest Regression and aggregated season stats.
+""")
+
+st.subheader("Step 1: Data Preparation")
+st.write("""
+- Copied the original dataset to avoid modifying it directly.
+- Created a binary `WIN` feature from the win/loss result.
+- Calculated total wins and ranked teams by wins per season.
+- Aggregated mean stats per team per season to serve as features.
+""")
+st.code("""
+data = all_games.copy()
+
+data['WIN'] = (data['WL'] == 'W').astype(int)
+
+team_wins = data.groupby(['TEAM_NAME', 'SEASON'])['WIN'].sum().reset_index()
+team_wins['TEAM_RANK'] = team_wins.groupby('SEASON')['WIN'].rank(ascending=False, method='dense')
+
+group_stats = data.groupby(['TEAM_NAME', 'SEASON']).agg({
+    'PTS': 'mean','AST': 'mean','REB': 'mean','FG_PCT': 'mean','FG3_PCT': 'mean',
+    'FT_PCT': 'mean','TOV': 'mean','FGA': 'mean','FG3A': 'mean',
+    'FTA': 'mean','OREB': 'mean','DREB': 'mean','STL': 'mean','BLK': 'mean','PF': 'mean',
+}).reset_index()
+
+complete_set = pd.merge(group_stats, team_wins[['TEAM_NAME', 'SEASON', 'TEAM_RANK']], on=['TEAM_NAME', 'SEASON'])
+""")
+
+st.subheader("Step 2: Feature Scaling and Model Training")
+st.write("""
+Scaled the features for consistent range, then split into train/test sets and trained the Random Forest model.
+""")
+st.code("""
+X = complete_set.drop(['TEAM_NAME', 'SEASON', 'TEAM_RANK'], axis=1)
+y = complete_set['TEAM_RANK']
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+reg = RandomForestRegressor(n_estimators=100, random_state=42)
+reg.fit(X_train, y_train)
+
+y_pred = reg.predict(X_test)
+""")
+
+st.subheader("Step 3: Model Evaluation")
+st.code("""
+mse = root_mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+mean = mean_absolute_error(y_test, y_pred)
+
+print(f"RMSE: {mse:.2f}")
+print(f"R2: {r2:.4f}")
+print(f"MAE: {mean:.2f}")
+""")
+st.write("""
+- RMSE and MAE show the model's predicted rank is usually off by about 4 places, which is reasonable.
+- R² around 0.51 means the model explains just over half the variance in team rankings, which is promising.
+- Small difference between RMSE and MAE suggests consistent prediction errors without many outliers.
+""")
+
+st.subheader("Step 4: Model Improvements and Data Leakage")
+st.write("""
+Previously, I accidentally included `PLUS_MINUS` as a feature, which caused data leakage since it directly relates to point differentials and winning.
+
+After removing it, model performance dropped but became more valid and trustworthy.
+""")
+
+st.subheader("Step 5: Insights on Feature Importance")
+st.write("""
+The model shows that `FG3_PCT` (3-point field goal percentage) is by far the most important predictor for team rank.
+
+This matches NBA trends where strong 3-point shooting correlates strongly with winning and better rankings.
+""")
+
+st.markdown("---")
+
+st.write("Overall, both models demonstrate how game and season stats can be used to predict team scoring and ranking, highlighting key stats like assists and three-point shooting.")
+
+st.subheader("Conclusion")
+st.write("""
+Random Forest turned out to be a solid choice. It:
+- Captured relationships between stats and team performance
+- Gave decent accuracy using just gameplay stats
+- Helped explain what drives team scoring
+
+This model could serve as a foundation for predicting future team performances, 
+or be extended by adding contextual data like opponent strength or home/away effects.
 """)
 
 
